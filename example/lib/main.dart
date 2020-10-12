@@ -51,9 +51,9 @@ class ProfileFlow extends StatelessWidget {
     return FlowBuilder<Profile>(
       initialValue: const Profile(),
       steps: [
-        (context, value, controller) => ProfileNameForm(),
-        (context, value, controller) => ProfileAgeForm(),
-        (context, value, controller) => ProfileWeightForm(),
+        (context, value) => ProfileNameForm(),
+        (context, value) => ProfileAgeForm(),
+        (context, value) => ProfileWeightForm(),
       ],
     );
   }

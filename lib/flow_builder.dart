@@ -70,8 +70,7 @@ class FlowController<S> extends Cubit<_FlowState<S>> {
   }
 }
 
-typedef FlowWidgetBuilder<S> = Widget Function(
-    BuildContext, S, FlowController<S>);
+typedef FlowWidgetBuilder<S> = Widget Function(BuildContext, S);
 
 class FlowBuilder<S> extends StatefulWidget {
   const FlowBuilder({
@@ -151,11 +150,7 @@ class _FlowBuilderState<S> extends State<FlowBuilder<S>> {
             pages: [
               for (final step in state.history)
                 MaterialPage<void>(
-                  child: widget.steps[step](
-                    context,
-                    state.value,
-                    context.flow<S>(),
-                  ),
+                  child: widget.steps[step](context, state.value),
                 )
             ],
             onPopPage: (route, dynamic result) {
