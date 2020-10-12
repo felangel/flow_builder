@@ -10,9 +10,9 @@ Flows made easy in Flutter
 FlowBuilder<Profile>(
   initialValue: const Profile(),
   steps: [
-    (context, value) => NameForm(),
-    (context, value) => AgeForm(),
-    (context, value) => WeightForm(),
+    (context, state) => MaterialPage(child: ProfileNameForm()),
+    (context, state) => MaterialPage(child: ProfileAgeForm()),
+    (context, state) => MaterialPage(child: ProfileWeightForm()),
   ],
 );
 ```

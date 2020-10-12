@@ -49,11 +49,11 @@ class ProfileFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<Profile>(
-      initialValue: const Profile(),
+      initialState: const Profile(),
       steps: [
-        (context, value) => ProfileNameForm(),
-        (context, value) => ProfileAgeForm(),
-        (context, value) => ProfileWeightForm(),
+        (context, state) => MaterialPage(child: ProfileNameForm()),
+        (context, state) => MaterialPage(child: ProfileAgeForm()),
+        (context, state) => MaterialPage(child: ProfileWeightForm()),
       ],
     );
   }
