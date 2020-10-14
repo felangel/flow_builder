@@ -1,6 +1,9 @@
 # flow_builder
 
-Flutter Flows made easy!
+![build](https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master)
+[![pub package](https://img.shields.io/pub/v/flow_builder.svg)](https://pub.dev/packages/flow_builder)
+
+**Flutter Flows made easy!**
 
 ## Usage
 
