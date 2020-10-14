@@ -3,8 +3,7 @@ library flow_builder;
 import 'dart:collection';
 import 'package:flutter/widgets.dart';
 
-typedef PageBuilder<T> = List<Page> Function(
-    BuildContext, T, FlowController<T>);
+typedef PageBuilder<T> = List<Page> Function(BuildContext, T);
 
 typedef Update<T> = void Function(T Function(T));
 
@@ -34,12 +33,10 @@ class FlowBuilder<T> extends StatefulWidget {
 class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   final _history = ListQueue<T>();
   T _state;
-  FlowController<T> _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = FlowController<T>._(_update, _complete);
     _state = widget.state;
     _history.add(_state);
   }
@@ -70,14 +67,18 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     return _FlowState(
       update: _update,
       complete: _complete,
-      child: Navigator(
-        pages: widget.builder(context, _state, _controller),
-        onPopPage: (route, dynamic result) {
-          if (_history.isNotEmpty) {
-            _history.removeLast();
-            _state = _history.last;
-          }
-          return route.didPop(result);
+      child: Builder(
+        builder: (context) {
+          return Navigator(
+            pages: widget.builder(context, _state),
+            onPopPage: (route, dynamic result) {
+              if (_history.isNotEmpty) {
+                _history.removeLast();
+                _state = _history.last;
+              }
+              return route.didPop(result);
+            },
+          );
         },
       ),
     );
