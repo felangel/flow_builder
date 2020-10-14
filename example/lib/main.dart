@@ -8,11 +8,8 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: Home());
-  }
+class MyApp extends MaterialApp {
+  MyApp({Key key}) : super(key: key, home: Home());
 }
 
 class Home extends StatelessWidget {
@@ -52,9 +49,10 @@ class ProfileFlow extends StatelessWidget {
       state: const Profile(),
       builder: (context, profile, controller) {
         return [
-          MaterialPage(child: ProfileNameForm()),
-          if (profile.name != null) MaterialPage(child: ProfileAgeForm()),
-          if (profile.age != null) MaterialPage(child: ProfileWeightForm()),
+          MaterialPage<void>(child: ProfileNameForm()),
+          if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
+          if (profile.age != null)
+            MaterialPage<void>(child: ProfileWeightForm()),
         ];
       },
     );
@@ -82,7 +80,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
           children: <Widget>[
             TextField(
               onChanged: (value) => setState(() => _name = value),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Name',
                 hintText: 'John Doe',
               ),
@@ -119,7 +117,7 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
           children: <Widget>[
             TextField(
               onChanged: (value) => setState(() => _age = int.parse(value)),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Age',
                 hintText: '42',
               ),
@@ -159,7 +157,7 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
           children: <Widget>[
             TextField(
               onChanged: (value) => setState(() => _weight = int.parse(value)),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Weight (lbs)',
                 hintText: '170',
               ),

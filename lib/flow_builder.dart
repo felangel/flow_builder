@@ -10,13 +10,21 @@ typedef Update<T> = void Function(T Function(T));
 
 typedef Complete<T> = void Function(T Function(T));
 
+/// {@template flow_builder}
+/// [FlowBuilder] abstracts navigation and exposes a declarative routing API
+/// based on a state.
+/// {@endtemplate}
 class FlowBuilder<T> extends StatefulWidget {
+  /// {@macro flow_builder}
   const FlowBuilder({Key key, @required this.builder, @required this.state})
       : assert(builder != null),
         assert(state != null),
         super(key: key);
 
+  /// Builds a [List<Page>] based on the current state.
   final PageBuilder<T> builder;
+
+  /// The state of the flow.
   final T state;
 
   @override
@@ -24,8 +32,8 @@ class FlowBuilder<T> extends StatefulWidget {
 }
 
 class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
+  final _history = ListQueue<T>();
   T _state;
-  ListQueue<T> _history = ListQueue<T>();
   FlowController<T> _controller;
 
   @override
@@ -64,7 +72,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       complete: _complete,
       child: Navigator(
         pages: widget.builder(context, _state, _controller),
-        onPopPage: (route, result) {
+        onPopPage: (route, dynamic result) {
           if (_history.isNotEmpty) {
             _history.removeLast();
             _state = _history.last;
@@ -90,7 +98,7 @@ class _FlowState<T> extends InheritedWidget {
   static _FlowState<T> of<T>(BuildContext context) {
     return context
         .getElementForInheritedWidgetOfExactType<_FlowState<T>>()
-        .widget;
+        .widget as _FlowState<T>;
   }
 
   @override
@@ -98,15 +106,37 @@ class _FlowState<T> extends InheritedWidget {
       oldWidget.update != update || oldWidget.complete != complete;
 }
 
+/// {@template flow_extension}
+/// Extension on [BuildContext] which exposes the ability to access
+/// a [FlowController].
+/// {@endtemplate}
 extension FlowX on BuildContext {
+  /// {@macro flow_extension}
   FlowController<T> flow<T>() {
     final state = _FlowState.of<T>(this);
     return FlowController<T>._(state.update, state.complete);
   }
 }
 
+/// {@template flow_controller}
+/// A controller which exposes APIs to [update] and [complete]
+/// the current flow.
+/// {@endtemplate}
 class FlowController<T> {
   const FlowController._(this.update, this.complete);
-  final void Function(T Function(T) cb) update;
-  final void Function(T Function(T) cb) complete;
+
+  /// [update] can be called to update the current flow state.
+  /// [update] takes a closure which exposes the current flow state
+  /// and is responsible for returning the new flow state.
+  ///
+  /// When [update] is called, the `builder` method of the corresponding
+  /// [FlowBuilder] will be called with the new flow state.
+  final void Function(T Function(T)) update;
+
+  /// [complete] can be called to complete the current flow.
+  /// [complete] takes a closure which exposes the current flow state
+  /// and is responsible for returning the new flow state.
+  ///
+  /// When [complete] is called, the flow is popped with the new flow state.
+  final void Function(T Function(T)) complete;
 }

@@ -1,5 +1,5 @@
 name: flow_builder
-description: Flows made easy in Flutter
+description: Flutter Flows made easy! A Flutter package which simplifies flows with a flexible, declarative API.
 
 version: 0.0.1-dev.1
 
@@ -9,5 +9,3 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  equatable: ^1.2.5
-  flutter_bloc: ^6.0.0

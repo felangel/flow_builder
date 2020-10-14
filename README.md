@@ -1,6 +1,6 @@
 # flow_builder
 
-Flows made easy in Flutter
+Flutter Flows made easy!
 
 ## Usage
 
