@@ -34,9 +34,9 @@ FlowBuilder<Profile>(
   state: const Profile(),
   builder: (context, profile, controller) {
     return [
-      MaterialPage(child: ProfileNameForm()),
-      if (profile.name != null) MaterialPage(child: ProfileAgeForm()),
-      if (profile.age != null) MaterialPage(child: ProfileWeightForm()),
+      MaterialPage(child: NameForm()),
+      if (profile.name != null) MaterialPage(child: AgeForm()),
+      if (profile.age != null) MaterialPage(child: WeightForm()),
     ];
   },
 );
@@ -86,12 +86,12 @@ class _NameFormState extends State<NameForm> {
 ### Complete the Flow
 
 ```dart
-class ProfileWeightForm extends StatefulWidget {
+class WeightForm extends StatefulWidget {
   @override
-  _ProfileWeightFormState createState() => _ProfileWeightFormState();
+  _WeightFormState createState() => _WeightFormState();
 }
 
-class _ProfileWeightFormState extends State<ProfileWeightForm> {
+class _WeightFormState extends State<WeightForm> {
   int _weight;
 
   void _continuePressed() {
