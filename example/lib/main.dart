@@ -49,12 +49,14 @@ class ProfileFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<Profile>(
-      initialState: const Profile(),
-      steps: [
-        (context, state) => MaterialPage(child: ProfileNameForm()),
-        (context, state) => MaterialPage(child: ProfileAgeForm()),
-        (context, state) => MaterialPage(child: ProfileWeightForm()),
-      ],
+      state: const Profile(),
+      builder: (context, profile, controller) {
+        return [
+          MaterialPage(child: ProfileNameForm()),
+          if (profile.name != null) MaterialPage(child: ProfileAgeForm()),
+          if (profile.age != null) MaterialPage(child: ProfileWeightForm()),
+        ];
+      },
     );
   }
 }
@@ -68,7 +70,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
   var _name = '';
 
   void _continuePressed() {
-    context.flow<Profile>().forward((profile) => profile.copyWith(name: _name));
+    context.flow<Profile>().update((profile) => profile.copyWith(name: _name));
   }
 
   @override
@@ -105,7 +107,7 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
   int _age;
 
   void _continuePressed() {
-    context.flow<Profile>().forward((profile) => profile.copyWith(age: _age));
+    context.flow<Profile>().update((profile) => profile.copyWith(age: _age));
   }
 
   @override
@@ -145,7 +147,7 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
   void _continuePressed() {
     context
         .flow<Profile>()
-        .forward((profile) => profile.copyWith(weight: _weight));
+        .complete((profile) => profile.copyWith(weight: _weight));
   }
 
   @override

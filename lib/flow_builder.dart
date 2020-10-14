@@ -1,167 +1,112 @@
 library flow_builder;
 
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:collection';
+import 'package:flutter/widgets.dart';
 
-class _FlowState<T> extends Equatable {
-  const _FlowState({this.step = 0, this.value, this.history = const <int>[0]});
+typedef PageBuilder<T> = List<Page> Function(
+    BuildContext, T, FlowController<T>);
 
-  final int step;
-  final T value;
-  final List<int> history;
+typedef Update<T> = void Function(T Function(T));
 
-  _FlowState<T> copyWith({int step, T value, List<int> history}) {
-    return _FlowState(
-      step: step ?? this.step,
-      value: value ?? this.value,
-      history: history ?? this.history,
-    );
-  }
+typedef Complete<T> = void Function(T Function(T));
 
-  @override
-  List<Object> get props => [step, value, history];
-}
-
-class FlowController<S> extends Cubit<_FlowState<S>> {
-  FlowController(_FlowState<S> state, this._numSteps) : super(state);
-
-  final int _numSteps;
-
-  void forward([S Function(S value) value]) {
-    emit(state.copyWith(
-      value: value?.call(state.value),
-      step: state.step + 1,
-      history: state.step + 1 < _numSteps
-          ? (List.of(state.history)..add(state.step + 1))
-          : null,
-    ));
-  }
-
-  void goTo(int step, [S Function(S state) value]) {
-    emit(state.copyWith(
-      value: value?.call(state.value),
-      step: step,
-      history: List.of(state.history)..add(step),
-    ));
-  }
-
-  void back([S Function(S value) value]) {
-    emit(state.copyWith(
-      value: value?.call(state.value),
-      step: state.step - 1,
-      history:
-          state.step - 1 >= 0 ? (List.of(state.history)..removeLast()) : null,
-    ));
-  }
-
-  void complete([S Function(S value) value]) {
-    emit(state.copyWith(
-      value: value?.call(state.value),
-      step: _numSteps,
-    ));
-  }
-
-  void exit([S Function(S value) value]) {
-    emit(state.copyWith(
-      value: value?.call(state.value),
-      step: -1,
-    ));
-  }
-}
-
-typedef FlowWidgetBuilder<S> = Page Function(BuildContext, S);
-
-class FlowBuilder<S> extends StatefulWidget {
-  const FlowBuilder({
-    Key key,
-    @required this.steps,
-    this.initialState,
-    this.initialStep,
-    this.onComplete,
-    this.onExit,
-    this.controller,
-  })  : assert(steps != null),
-        assert(steps.length > 0),
+class FlowBuilder<T> extends StatefulWidget {
+  const FlowBuilder({Key key, @required this.builder, @required this.state})
+      : assert(builder != null),
+        assert(state != null),
         super(key: key);
 
-  final S initialState;
-  final int initialStep;
-  final List<FlowWidgetBuilder<S>> steps;
-  final ValueSetter<S> onComplete;
-  final ValueSetter<S> onExit;
-  final FlowController<S> controller;
+  final PageBuilder<T> builder;
+  final T state;
 
   @override
-  _FlowBuilderState<S> createState() => _FlowBuilderState<S>();
+  _FlowBuilderState<T> createState() => _FlowBuilderState<T>();
 }
 
-class _FlowBuilderState<S> extends State<FlowBuilder<S>> {
-  FlowController<S> _controller;
-
-  void _initController() {
-    _controller?.close();
-    _controller = widget.controller ??
-        FlowController<S>(
-          _FlowState(
-            value: widget.initialState,
-            step: widget.initialStep ?? 0,
-            history: [widget.initialStep ?? 0],
-          ),
-          widget.steps.length,
-        );
-  }
+class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
+  T _state;
+  ListQueue<T> _history = ListQueue<T>();
+  FlowController<T> _controller;
 
   @override
   void initState() {
     super.initState();
-    _initController();
+    _controller = FlowController<T>._(_update, _complete);
+    _state = widget.state;
+    _history.add(_state);
   }
 
   @override
-  void didUpdateWidget(covariant FlowBuilder<S> oldWidget) {
+  void didUpdateWidget(covariant FlowBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
-      _initController();
+    if (oldWidget.state != widget.state) {
+      _state = widget.state;
+      _history
+        ..clear()
+        ..add(_state);
     }
   }
 
-  @override
-  void dispose() {
-    _controller.close();
-    super.dispose();
+  void _update(T Function(T) update) {
+    setState(() {
+      final state = update(_state);
+      _history.add(state);
+      _state = state;
+    });
   }
+
+  void _complete(T Function(T) pop) => Navigator.of(context).pop(pop(_state));
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _controller,
-      child: BlocConsumer<Cubit<_FlowState<S>>, _FlowState<S>>(
-        cubit: _controller,
-        listener: (context, state) {
-          if (state.step >= widget.steps.length) {
-            (widget.onComplete ?? Navigator.of(context).pop).call(state.value);
-          } else if (state.step < 0) {
-            (widget.onExit ?? Navigator.of(context).pop).call(state.value);
+    return _FlowState(
+      update: _update,
+      complete: _complete,
+      child: Navigator(
+        pages: widget.builder(context, _state, _controller),
+        onPopPage: (route, result) {
+          if (_history.isNotEmpty) {
+            _history.removeLast();
+            _state = _history.last;
           }
-        },
-        builder: (context, state) {
-          return Navigator(
-            pages: [
-              for (final step in state.history)
-                widget.steps[step](context, state.value),
-            ],
-            onPopPage: (route, dynamic result) {
-              _controller.back();
-              return false;
-            },
-          );
+          return route.didPop(result);
         },
       ),
     );
   }
 }
 
-extension FlowControllerX on BuildContext {
-  FlowController<S> flow<S>() => bloc<FlowController<S>>();
+class _FlowState<T> extends InheritedWidget {
+  const _FlowState({
+    Key key,
+    @required this.update,
+    @required this.complete,
+    @required Widget child,
+  }) : super(key: key, child: child);
+
+  final Update<T> update;
+  final Complete<T> complete;
+
+  static _FlowState<T> of<T>(BuildContext context) {
+    return context
+        .getElementForInheritedWidgetOfExactType<_FlowState<T>>()
+        .widget;
+  }
+
+  @override
+  bool updateShouldNotify(_FlowState<T> oldWidget) =>
+      oldWidget.update != update || oldWidget.complete != complete;
+}
+
+extension FlowX on BuildContext {
+  FlowController<T> flow<T>() {
+    final state = _FlowState.of<T>(this);
+    return FlowController<T>._(state.update, state.complete);
+  }
+}
+
+class FlowController<T> {
+  const FlowController._(this.update, this.complete);
+  final void Function(T Function(T) cb) update;
+  final void Function(T Function(T) cb) complete;
 }
