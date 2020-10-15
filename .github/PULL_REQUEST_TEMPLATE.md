@@ -29,3 +29,4 @@ YES | NO
 - [ ] ✅ Build configuration change
 - [ ] 📝 Documentation
 - [ ] 🗑️ Chore
+- [ ] 🧪 Testing
