@@ -25,3 +25,9 @@ jobs:
 
       - name: Analyze
         run: flutter analyze lib example
+
+      - name: Run tests
+        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
+
+      - name: Check Code Coverage
+        uses: ChicagoFlutter/lcov-cop@v1.0.0

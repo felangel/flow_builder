@@ -11,13 +11,12 @@ typedef Complete<T> = void Function(T Function(T));
 
 /// {@template flow_builder}
 /// [FlowBuilder] abstracts navigation and exposes a declarative routing API
-/// based on a state.
+/// based on a [state].
 /// {@endtemplate}
 class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
   const FlowBuilder({Key key, @required this.builder, @required this.state})
       : assert(builder != null),
-        assert(state != null),
         super(key: key);
 
   /// Builds a [List<Page>] based on the current state.
