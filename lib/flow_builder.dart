@@ -71,7 +71,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
           return Navigator(
             pages: widget.builder(context, _state),
             onPopPage: (route, dynamic result) {
-              if (_history.isNotEmpty) {
+              if (_history.length > 1) {
                 _history.removeLast();
                 _state = _history.last;
               }
