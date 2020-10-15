@@ -1,6 +1,7 @@
 # flow_builder
 
-![build](https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master)
+[![build](https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master)](https://github.com/felangel/flow_builder/actions)
+[![coverage](https://github.com/felangel/flow_builder/blob/master/coverage_badge.svg)](https://github.com/felangel/flow_builder/actions)
 [![pub package](https://img.shields.io/pub/v/flow_builder.svg)](https://pub.dev/packages/flow_builder)
 
 **Flutter Flows made easy!**
