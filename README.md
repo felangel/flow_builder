@@ -1,8 +1,12 @@
-# flow_builder
+<p align="center">
+<img src="https://raw.githubusercontent.com/felangel/flow_builder/master/art/flow_builder_logo.png" height="100" alt="Flow Builder" />
+</p>
 
-[![build](https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master)](https://github.com/felangel/flow_builder/actions)
-[![coverage](https://github.com/felangel/flow_builder/blob/master/coverage_badge.svg)](https://github.com/felangel/flow_builder/actions)
-[![pub package](https://img.shields.io/pub/v/flow_builder.svg)](https://pub.dev/packages/flow_builder)
+<p align="center">
+<a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master" alt="build"></a>
+<a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/blob/master/coverage_badge.svg" alt="coverage"></a>
+<a href="https://pub.dev/packages/flow_builder"><img src="https://img.shields.io/pub/v/flow_builder.svg" alt="pub package"></a>
+</p>
 
 **Flutter Flows made easy!**
 
