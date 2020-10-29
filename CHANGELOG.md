@@ -1,3 +1,7 @@
+# 0.0.1-dev.5
+
+- docs: fix README badges (CORS)
+
 # 0.0.1-dev.4
 
 - **BREAKING**: replace `builder` with `onGeneratePages`
