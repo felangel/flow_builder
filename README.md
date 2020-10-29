@@ -6,7 +6,6 @@
   <b>Flutter Flows made easy!</b>
 </p>
 
-
 <p align="center">
 <a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master" alt="build"></a>
 <a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/blob/master/coverage_badge.svg" alt="coverage"></a>
@@ -43,7 +42,7 @@ class Profile extends Equatable {
 ```dart
 FlowBuilder<Profile>(
   state: const Profile(),
-  builder: (context, profile) {
+  onGeneratePages: (profile) {
     return [
       MaterialPage(child: NameForm()),
       if (profile.name != null) MaterialPage(child: AgeForm()),

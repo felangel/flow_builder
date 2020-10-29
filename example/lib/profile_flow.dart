@@ -2,6 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flow_builder/flow_builder.dart';
 
+List<Page> onGenerateProfilePages(Profile profile) {
+  return [
+    MaterialPage<void>(child: ProfileNameForm()),
+    if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
+    if (profile.age != null) MaterialPage<void>(child: ProfileWeightForm()),
+  ];
+}
+
 class ProfileFlow extends StatelessWidget {
   static Route<Profile> route() {
     return MaterialPageRoute(builder: (_) => ProfileFlow());
@@ -9,16 +17,9 @@ class ProfileFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<Profile>(
-      state: const Profile(),
-      builder: (context, profile) {
-        return [
-          MaterialPage<void>(child: ProfileNameForm()),
-          if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
-          if (profile.age != null)
-            MaterialPage<void>(child: ProfileWeightForm()),
-        ];
-      },
+    return const FlowBuilder<Profile>(
+      state: Profile(),
+      onGeneratePages: onGenerateProfilePages,
     );
   }
 }

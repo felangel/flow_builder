@@ -1,3 +1,9 @@
+# 0.0.1-dev.4
+
+- **BREAKING**: replace `builder` with `onGeneratePages`
+- fix: navigation animation
+- fix: system back navigation
+
 # 0.0.1-dev.3
 
 - fix: pop after external state change exception
