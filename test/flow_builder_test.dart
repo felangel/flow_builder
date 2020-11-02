@@ -178,6 +178,66 @@ void main() {
       expect(find.text('Result: 1'), findsOneWidget);
     });
 
+    testWidgets('complete invokes onComplete', (tester) async {
+      const startButtonKey = Key('__start_button__');
+      const completeButtonKey = Key('__complete_button__');
+      var numBuilds = 0;
+      var onCompleteCalls = <int>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return TextButton(
+                  key: startButtonKey,
+                  child: const Text('Button'),
+                  onPressed: () {
+                    Navigator.of(context).push<int>(
+                      MaterialPageRoute<int>(
+                        builder: (_) => FlowBuilder<int>(
+                          state: 0,
+                          onGeneratePages: (state) {
+                            numBuilds++;
+                            return <Page>[
+                              MaterialPage<void>(
+                                child: Builder(
+                                  builder: (context) => TextButton(
+                                    key: completeButtonKey,
+                                    child: const Text('Button'),
+                                    onPressed: () => context
+                                        .flow<int>()
+                                        .complete((s) => s + 1),
+                                  ),
+                                ),
+                              ),
+                            ];
+                          },
+                          onComplete: onCompleteCalls.add,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(startButtonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 1);
+
+      await tester.tap(find.byKey(completeButtonKey));
+      await tester.pumpAndSettle();
+
+      expect(onCompleteCalls, [1]);
+      expect(numBuilds, 1);
+      expect(find.byKey(startButtonKey), findsNothing);
+      expect(find.byKey(completeButtonKey), findsOneWidget);
+    });
+
     testWidgets('back button pops parent route', (tester) async {
       const buttonKey = Key('__button__');
       const scaffoldKey = Key('__scaffold__');
