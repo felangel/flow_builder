@@ -1,3 +1,7 @@
+# 0.0.1-dev.6
+
+- feat: add `onComplete`
+
 # 0.0.1-dev.5
 
 - docs: fix README badges (CORS)

@@ -16,15 +16,39 @@ typedef OnGeneratePages<T> = List<Page> Function(T);
 /// {@template flow_builder}
 /// [FlowBuilder] abstracts navigation and exposes a declarative routing API
 /// based on a [state].
+///
+/// By default completing a flow results in the flow being popped from
+/// the navigation stack with the resulting flow state.
+///
+/// To override the default behavior, provide an
+/// implementation for `onComplete`.
+///
+/// ```dart
+/// FlowBuilder<MyFlowState>(
+///   state: MyFlowState.initial(),
+///   onGeneratePages: (state) {...},
+///   onComplete: (state) {
+///     // do something when flow is completed...
+///   }
+/// )
+/// ```
 /// {@endtemplate}
 class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
-  const FlowBuilder({Key key, @required this.state, this.onGeneratePages})
-      : assert(onGeneratePages != null),
+  const FlowBuilder({
+    Key key,
+    @required this.state,
+    @required this.onGeneratePages,
+    this.onComplete,
+  })  : assert(onGeneratePages != null),
         super(key: key);
 
   /// Builds a [List<Page>] based on the current state.
   final OnGeneratePages<T> onGeneratePages;
+
+  /// Optional [ValueSetter<T>] which is invoked when the
+  /// flow has been completed with the final flow state.
+  final ValueSetter<T> onComplete;
 
   /// The state of the flow.
   final T state;
@@ -60,7 +84,14 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     }
   }
 
-  void _complete(T Function(T) pop) => Navigator.of(context).pop(pop(_state));
+  void _complete(T Function(T) pop) {
+    final state = pop(_state);
+    if (widget.onComplete != null) {
+      widget.onComplete(state);
+      return;
+    }
+    Navigator.of(context).pop(state);
+  }
 
   void _update(T Function(T) update) {
     final state = update(_state);
