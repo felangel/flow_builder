@@ -14,18 +14,23 @@ void main() {
 
     test('does not throw when state is null', () async {
       expect(
-        () => FlowBuilder(onGeneratePages: (dynamic __) => [], state: null),
+        () => FlowBuilder(
+          onGeneratePages: (dynamic _, List<Page> __) => [],
+          state: null,
+        ),
         isNot(throwsAssertionError),
       );
     });
 
     testWidgets('renders correct navigation stack w/one page', (tester) async {
       const targetKey = Key('__target__');
+      var lastPages = <Page>[];
       await tester.pumpWidget(
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
+              lastPages = pages;
               return const <Page>[
                 MaterialPage<void>(child: SizedBox(key: targetKey)),
               ];
@@ -34,6 +39,7 @@ void main() {
         ),
       );
       expect(find.byKey(targetKey), findsOneWidget);
+      expect(lastPages, isEmpty);
     });
 
     testWidgets('renders correct navigation stack w/multi-page',
@@ -44,7 +50,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               return const <Page>[
                 MaterialPage<void>(child: SizedBox(key: box1Key)),
                 MaterialPage<void>(child: SizedBox(key: box2Key)),
@@ -65,7 +71,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               return <Page>[
                 const MaterialPage<void>(child: SizedBox(key: box1Key)),
                 if (state >= 1)
@@ -83,12 +89,14 @@ void main() {
       const buttonKey = Key('__button__');
       const boxKey = Key('__box__');
       var numBuilds = 0;
+      var lastPages = <Page>[];
       await tester.pumpWidget(
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               numBuilds++;
+              lastPages = pages;
               return <Page>[
                 MaterialPage<void>(
                   child: Builder(
@@ -109,6 +117,7 @@ void main() {
       expect(numBuilds, 1);
       expect(find.byKey(buttonKey), findsOneWidget);
       expect(find.byKey(boxKey), findsNothing);
+      expect(lastPages, isEmpty);
 
       await tester.tap(find.byKey(buttonKey));
       await tester.pumpAndSettle();
@@ -116,6 +125,7 @@ void main() {
       expect(numBuilds, 2);
       expect(find.byKey(buttonKey), findsNothing);
       expect(find.byKey(boxKey), findsOneWidget);
+      expect(lastPages.length, equals(1));
     });
 
     testWidgets('complete terminates the flow', (tester) async {
@@ -135,7 +145,7 @@ void main() {
                       MaterialPageRoute<int>(
                         builder: (_) => FlowBuilder<int>(
                           state: 0,
-                          onGeneratePages: (state) {
+                          onGeneratePages: (state, pages) {
                             numBuilds++;
                             return <Page>[
                               MaterialPage<void>(
@@ -196,7 +206,7 @@ void main() {
                       MaterialPageRoute<int>(
                         builder: (_) => FlowBuilder<int>(
                           state: 0,
-                          onGeneratePages: (state) {
+                          onGeneratePages: (state, pages) {
                             numBuilds++;
                             return <Page>[
                               MaterialPage<void>(
@@ -246,7 +256,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               numBuilds++;
               return <Page>[
                 MaterialPage<void>(
@@ -301,7 +311,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               numBuilds++;
               return <Page>[
                 MaterialPage<void>(
@@ -362,7 +372,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               numBuilds++;
               return <Page>[
                 MaterialPage<void>(
@@ -423,7 +433,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               return <Page>[
                 MaterialPage<void>(
                   child: Scaffold(
@@ -470,7 +480,7 @@ void main() {
         MaterialApp(
           home: FlowBuilder<int>(
             state: 0,
-            onGeneratePages: (state) {
+            onGeneratePages: (state, pages) {
               return <Page>[
                 MaterialPage<void>(
                   child: Scaffold(
@@ -503,7 +513,7 @@ void main() {
             builder: (context, setState) {
               return FlowBuilder<int>(
                 state: flowState,
-                onGeneratePages: (state) {
+                onGeneratePages: (state, pages) {
                   numBuilds++;
                   return <Page>[
                     MaterialPage<void>(

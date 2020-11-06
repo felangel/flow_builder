@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flow_builder/flow_builder.dart';
 
-List<Page> onGenerateProfilePages(Profile profile) {
+List<Page> onGenerateProfilePages(Profile profile, List<Page> pages) {
   return [
     MaterialPage<void>(child: ProfileNameForm()),
     if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
