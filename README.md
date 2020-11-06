@@ -42,7 +42,7 @@ class Profile extends Equatable {
 ```dart
 FlowBuilder<Profile>(
   state: const Profile(),
-  onGeneratePages: (profile) {
+  onGeneratePages: (profile, pages) {
     return [
       MaterialPage(child: NameForm()),
       if (profile.name != null) MaterialPage(child: AgeForm()),
