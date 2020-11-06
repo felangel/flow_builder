@@ -1,3 +1,7 @@
+# 0.0.1-dev.7
+
+- **BREAKING**: update `onGeneratePages` to include previous `pages`.
+
 # 0.0.1-dev.6
 
 - feat: add `onComplete`

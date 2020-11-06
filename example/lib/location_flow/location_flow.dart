@@ -9,7 +9,7 @@ export 'models/models.dart';
 export 'repository/location_repository.dart';
 export 'widgets/widgets.dart';
 
-List<Page> onGenerateLocationPages(Location state) {
+List<Page> onGenerateLocationPages(Location state, List<Page> pages) {
   return [
     CountrySelection.page(),
     if (state.country != null) StateSelection.page(country: state.country),

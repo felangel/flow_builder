@@ -10,8 +10,9 @@ typedef Update<T> = void Function(T Function(T));
 /// Signature for [FlowController] `complete` function.
 typedef Complete<T> = void Function(T Function(T));
 
-/// Signature for function which generates a [List<Page>] given an input of [T].
-typedef OnGeneratePages<T> = List<Page> Function(T);
+/// Signature for function which generates a [List<Page>] given an input of [T]
+/// and the current [List<Page>].
+typedef OnGeneratePages<T> = List<Page> Function(T, List<Page>);
 
 /// {@template flow_builder}
 /// [FlowBuilder] abstracts navigation and exposes a declarative routing API
@@ -26,7 +27,7 @@ typedef OnGeneratePages<T> = List<Page> Function(T);
 /// ```dart
 /// FlowBuilder<MyFlowState>(
 ///   state: MyFlowState.initial(),
-///   onGeneratePages: (state) {...},
+///   onGeneratePages: (state, pages) {...},
 ///   onComplete: (state) {
 ///     // do something when flow is completed...
 ///   }
@@ -68,7 +69,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   void initState() {
     super.initState();
     _state = widget.state;
-    _pages = widget.onGeneratePages(_state);
+    _pages = widget.onGeneratePages(_state, List.of(_pages));
     _history.add(_state);
   }
 
@@ -77,7 +78,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state != widget.state) {
       _state = widget.state;
-      _pages = widget.onGeneratePages(_state);
+      _pages = widget.onGeneratePages(_state, List.of(_pages));
       _history
         ..clear()
         ..add(_state);
@@ -97,7 +98,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     final state = update(_state);
     setState(() {
       _state = state;
-      _pages = widget.onGeneratePages(_state);
+      _pages = widget.onGeneratePages(_state, List.of(_pages));
       _history.add(state);
     });
   }

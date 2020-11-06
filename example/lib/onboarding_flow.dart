@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow_builder/flow_builder.dart';
 
-List<Page> onGenerateOnboardingPages(OnboardingSteps state) {
+List<Page> onGenerateOnboardingPages(OnboardingSteps state, List<Page> pages) {
   switch (state) {
     case OnboardingSteps.step1:
       return [Step1.page()];
