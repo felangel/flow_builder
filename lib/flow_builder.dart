@@ -155,7 +155,18 @@ class _InheritedFlowController<T> extends InheritedWidget {
   static FlowController<T> of<T>(BuildContext context) {
     final inheritedFlowController = context
         .getElementForInheritedWidgetOfExactType<_InheritedFlowController<T>>()
-        .widget as _InheritedFlowController<T>;
+        ?.widget as _InheritedFlowController<T>;
+    if (inheritedFlowController?.controller == null) {
+      throw FlutterError(
+        '''
+        context.flow<$T>() called with a context that does not contain a FlowBuilder of type $T.
+
+        This can happen if the context you used comes from a widget above the FlowBuilder.
+
+        The context used was: $context
+        ''',
+      );
+    }
     return inheritedFlowController.controller;
   }
 

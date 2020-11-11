@@ -18,7 +18,7 @@ class StateSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-        return StateSelectionCubit(context.repository<LocationRepository>())
+        return StateSelectionCubit(context.read<LocationRepository>())
           ..statesRequested(country);
       },
       child: StateSelectionForm(),
@@ -47,7 +47,7 @@ class StateSelectionForm extends StatelessWidget {
                       items: state.locations,
                       value: state.selectedLocation,
                       onChanged: (value) => context
-                          .bloc<StateSelectionCubit>()
+                          .read<StateSelectionCubit>()
                           .stateSelected(value),
                     );
                   default:

@@ -1,6 +1,7 @@
 # 0.0.1-dev.8
 
 - feat: `FlowBuilder` accepts an optional `FlowController<T>`
+- feat: throw `FlutterError` when `context.flow` is called outside of a `FlowBuilder`
 
 # 0.0.1-dev.7
 

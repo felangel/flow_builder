@@ -33,6 +33,26 @@ void main() {
       );
     });
 
+    testWidgets(
+        'throws FlutterError when context.flow is called '
+        'outside of FlowBuilder', (tester) async {
+      await tester.pumpWidget(
+        Builder(builder: (context) {
+          context.flow<int>();
+          return const SizedBox();
+        }),
+      );
+      final exception = await tester.takeException() as FlutterError;
+      final expectedMessage = '''
+        context.flow<int>() called with a context that does not contain a FlowBuilder of type int.
+
+        This can happen if the context you used comes from a widget above the FlowBuilder.
+
+        The context used was: Builder(dirty)
+''';
+      expect(exception.message, expectedMessage);
+    });
+
     testWidgets('renders correct navigation stack w/one page', (tester) async {
       const targetKey = Key('__target__');
       var lastPages = <Page>[];
