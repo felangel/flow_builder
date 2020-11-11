@@ -3,6 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+class CustomFlowController<T> implements FlowController<T> {
+  var completeCallCount = 0;
+  var updateCallCount = 0;
+
+  @override
+  Complete<T> get complete => (_) => completeCallCount++;
+
+  @override
+  Update<T> get update => (_) => updateCallCount++;
+}
+
 void main() {
   group('FlowBuilder', () {
     test('throws AssertionError when onGeneratePages is null', () async {
@@ -542,6 +553,114 @@ void main() {
       expect(numBuilds, 2);
       expect(find.byKey(buttonKey), findsNothing);
       expect(find.byKey(boxKey), findsOneWidget);
+    });
+
+    testWidgets('can provide a custom FlowController', (tester) async {
+      const button1Key = Key('__button1__');
+      const button2Key = Key('__button2__');
+      final controller = CustomFlowController<int>();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            controller: controller,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                MaterialPage<void>(
+                  child: Builder(
+                    builder: (context) => Column(
+                      children: [
+                        TextButton(
+                          key: button1Key,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            context.flow<int>().update((s) => s + 1);
+                          },
+                        ),
+                        TextButton(
+                          key: button2Key,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            context.flow<int>().complete((s) => s + 1);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(button1Key));
+      expect(controller.completeCallCount, equals(0));
+      expect(controller.updateCallCount, equals(1));
+
+      await tester.tap(find.byKey(button2Key));
+      expect(controller.completeCallCount, equals(1));
+      expect(controller.updateCallCount, equals(1));
+    });
+
+    testWidgets('updates when FlowController changes', (tester) async {
+      const button1Key = Key('__button1__');
+      const button2Key = Key('__button2__');
+      const button3Key = Key('__button3__');
+      CustomFlowController<int> controller;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StatefulBuilder(
+            builder: (context, setState) {
+              return FlowBuilder<int>(
+                state: 0,
+                controller: controller,
+                onGeneratePages: (state, pages) {
+                  return <Page>[
+                    MaterialPage<void>(
+                      child: Builder(
+                        builder: (context) => Column(
+                          children: [
+                            TextButton(
+                              key: button1Key,
+                              child: const Text('Button'),
+                              onPressed: () {
+                                context.flow<int>().update((s) => s + 1);
+                              },
+                            ),
+                            TextButton(
+                              key: button2Key,
+                              child: const Text('Button'),
+                              onPressed: () {
+                                context.flow<int>().complete((s) => s + 1);
+                              },
+                            ),
+                            TextButton(
+                              key: button3Key,
+                              child: const Text('Button'),
+                              onPressed: () {
+                                controller = CustomFlowController<int>();
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ];
+                },
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(button3Key));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(button1Key));
+      await tester.tap(find.byKey(button2Key));
+
+      expect(controller.completeCallCount, equals(1));
+      expect(controller.updateCallCount, equals(1));
     });
   });
 }

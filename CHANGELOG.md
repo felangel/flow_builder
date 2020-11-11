@@ -1,3 +1,7 @@
+# 0.0.1-dev.8
+
+- feat: `FlowBuilder` accepts an optional `FlowController<T>`
+
 # 0.0.1-dev.7
 
 - **BREAKING**: update `onGeneratePages` to include previous `pages`.
