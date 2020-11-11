@@ -55,7 +55,7 @@ class FlowBuilder<T> extends StatefulWidget {
   /// The state of the flow.
   final T state;
 
-  /// Optional [FlowController] which will be used to in the current flow.
+  /// Optional [FlowController] which will be used in the current flow.
   /// If not provided, a [FlowController] instance will be created internally.
   final FlowController<T> controller;
 
