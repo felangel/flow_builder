@@ -41,6 +41,7 @@ class FlowBuilder<T> extends StatefulWidget {
     @required this.state,
     @required this.onGeneratePages,
     this.onComplete,
+    this.controller,
   })  : assert(onGeneratePages != null),
         super(key: key);
 
@@ -54,6 +55,10 @@ class FlowBuilder<T> extends StatefulWidget {
   /// The state of the flow.
   final T state;
 
+  /// Optional [FlowController] which will be used in the current flow.
+  /// If not provided, a [FlowController] instance will be created internally.
+  final FlowController<T> controller;
+
   @override
   _FlowBuilderState<T> createState() => _FlowBuilderState<T>();
 }
@@ -63,11 +68,13 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   var _pages = <Page>[];
   final _navigatorKey = GlobalKey<NavigatorState>();
   NavigatorState get _navigator => _navigatorKey.currentState;
+  FlowController<T> _controller;
   T _state;
 
   @override
   void initState() {
     super.initState();
+    _controller = widget.controller ?? FlowController._(_update, _complete);
     _state = widget.state;
     _pages = widget.onGeneratePages(_state, List.of(_pages));
     _history.add(_state);
@@ -76,6 +83,9 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   @override
   void didUpdateWidget(covariant FlowBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      _controller = widget.controller ?? FlowController._(_update, _complete);
+    }
     if (oldWidget.state != widget.state) {
       _state = widget.state;
       _pages = widget.onGeneratePages(_state, List.of(_pages));
@@ -105,9 +115,8 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return _FlowState(
-      update: _update,
-      complete: _complete,
+    return _InheritedFlowController(
+      controller: _controller,
       child: _ConditionalWillPopScope(
         condition: _pages.length > 1,
         onWillPop: () async {
@@ -134,26 +143,36 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   }
 }
 
-class _FlowState<T> extends InheritedWidget {
-  const _FlowState({
+class _InheritedFlowController<T> extends InheritedWidget {
+  const _InheritedFlowController({
     Key key,
-    @required this.update,
-    @required this.complete,
+    @required this.controller,
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final Update<T> update;
-  final Complete<T> complete;
+  final FlowController<T> controller;
 
-  static _FlowState<T> of<T>(BuildContext context) {
-    return context
-        .getElementForInheritedWidgetOfExactType<_FlowState<T>>()
-        .widget as _FlowState<T>;
+  static FlowController<T> of<T>(BuildContext context) {
+    final inheritedFlowController = context
+        .getElementForInheritedWidgetOfExactType<_InheritedFlowController<T>>()
+        ?.widget as _InheritedFlowController<T>;
+    if (inheritedFlowController?.controller == null) {
+      throw FlutterError(
+        '''
+        context.flow<$T>() called with a context that does not contain a FlowBuilder of type $T.
+
+        This can happen if the context you used comes from a widget above the FlowBuilder.
+
+        The context used was: $context
+        ''',
+      );
+    }
+    return inheritedFlowController.controller;
   }
 
   @override
-  bool updateShouldNotify(_FlowState<T> oldWidget) =>
-      oldWidget.update != update || oldWidget.complete != complete;
+  bool updateShouldNotify(_InheritedFlowController<T> oldWidget) =>
+      oldWidget.controller != controller;
 }
 
 /// {@template flow_extension}
@@ -162,10 +181,7 @@ class _FlowState<T> extends InheritedWidget {
 /// {@endtemplate}
 extension FlowX on BuildContext {
   /// {@macro flow_extension}
-  FlowController<T> flow<T>() {
-    final state = _FlowState.of<T>(this);
-    return FlowController<T>._(state.update, state.complete);
-  }
+  FlowController<T> flow<T>() => _InheritedFlowController.of<T>(this);
 }
 
 /// {@template flow_controller}
@@ -181,14 +197,14 @@ class FlowController<T> {
   ///
   /// When [update] is called, the `builder` method of the corresponding
   /// [FlowBuilder] will be called with the new flow state.
-  final void Function(T Function(T)) update;
+  final Update<T> update;
 
   /// [complete] can be called to complete the current flow.
   /// [complete] takes a closure which exposes the current flow state
   /// and is responsible for returning the new flow state.
   ///
   /// When [complete] is called, the flow is popped with the new flow state.
-  final void Function(T Function(T)) complete;
+  final Complete<T> complete;
 }
 
 class _ConditionalWillPopScope extends StatelessWidget {
