@@ -152,10 +152,11 @@ class _InheritedFlowController<T> extends InheritedWidget {
 
   final FlowController<T> controller;
 
-  static _InheritedFlowController<T> of<T>(BuildContext context) {
-    return context
+  static FlowController<T> of<T>(BuildContext context) {
+    final inheritedFlowController = context
         .getElementForInheritedWidgetOfExactType<_InheritedFlowController<T>>()
         .widget as _InheritedFlowController<T>;
+    return inheritedFlowController.controller;
   }
 
   @override
@@ -169,9 +170,7 @@ class _InheritedFlowController<T> extends InheritedWidget {
 /// {@endtemplate}
 extension FlowX on BuildContext {
   /// {@macro flow_extension}
-  FlowController<T> flow<T>() {
-    return _InheritedFlowController.of<T>(this).controller;
-  }
+  FlowController<T> flow<T>() => _InheritedFlowController.of<T>(this);
 }
 
 /// {@template flow_controller}
