@@ -27,7 +27,14 @@ class CountrySelectionForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Country')),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.flow<Location>().complete((location) => location);
+          },
+        ),
+        title: const Text('Country'),
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

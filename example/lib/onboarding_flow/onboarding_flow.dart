@@ -36,7 +36,13 @@ class Step1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.flow<OnboardingSteps>().complete((step) => step);
+          },
+        ),
+      ),
       body: const Center(child: Text('Onboarding Step 1')),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,

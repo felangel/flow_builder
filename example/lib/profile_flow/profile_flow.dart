@@ -39,7 +39,14 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Name')),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.flow<Profile>().complete((profile) => profile);
+          },
+        ),
+        title: const Text('Name'),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
