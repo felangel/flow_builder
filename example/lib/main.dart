@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:example/location_flow/location_flow.dart';
-import 'package:example/onboarding_flow.dart';
-import 'package:example/profile_flow.dart';
+import 'package:example/onboarding_flow/onboarding_flow.dart';
+import 'package:example/profile_flow/profile_flow.dart';
 
 void main() {
   EquatableConfig.stringify = kDebugMode;
