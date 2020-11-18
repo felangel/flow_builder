@@ -3,17 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class CustomFlowController<T> implements FlowController<T> {
-  var completeCallCount = 0;
-  var updateCallCount = 0;
-
-  @override
-  Complete<T> get complete => (_) => completeCallCount++;
-
-  @override
-  Update<T> get update => (_) => updateCallCount++;
-}
-
 void main() {
   group('FlowBuilder', () {
     test('throws AssertionError when onGeneratePages is null', () async {
@@ -575,14 +564,15 @@ void main() {
       expect(find.byKey(boxKey), findsOneWidget);
     });
 
-    testWidgets('can provide a custom FlowController', (tester) async {
+    testWidgets('can provide a FakeFlowController', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
-      final controller = CustomFlowController<int>();
+      const state = 0;
+      final controller = FakeFlowController<int>(state: state);
       await tester.pumpWidget(
         MaterialApp(
           home: FlowBuilder<int>(
-            state: 0,
+            state: state,
             controller: controller,
             onGeneratePages: (state, pages) {
               return <Page>[
@@ -614,19 +604,19 @@ void main() {
         ),
       );
       await tester.tap(find.byKey(button1Key));
-      expect(controller.completeCallCount, equals(0));
-      expect(controller.updateCallCount, equals(1));
+      expect(controller.completed, isFalse);
+      expect(controller.state, equals(1));
 
       await tester.tap(find.byKey(button2Key));
-      expect(controller.completeCallCount, equals(1));
-      expect(controller.updateCallCount, equals(1));
+      expect(controller.completed, isTrue);
+      expect(controller.state, equals(2));
     });
 
     testWidgets('updates when FlowController changes', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
       const button3Key = Key('__button3__');
-      CustomFlowController<int> controller;
+      FakeFlowController<int> controller;
       await tester.pumpWidget(
         MaterialApp(
           home: StatefulBuilder(
@@ -658,8 +648,11 @@ void main() {
                               key: button3Key,
                               child: const Text('Button'),
                               onPressed: () {
-                                controller = CustomFlowController<int>();
-                                setState(() {});
+                                setState(() {
+                                  controller = FakeFlowController<int>(
+                                    state: 0,
+                                  );
+                                });
                               },
                             ),
                           ],
@@ -679,8 +672,8 @@ void main() {
       await tester.tap(find.byKey(button1Key));
       await tester.tap(find.byKey(button2Key));
 
-      expect(controller.completeCallCount, equals(1));
-      expect(controller.updateCallCount, equals(1));
+      expect(controller.completed, isTrue);
+      expect(controller.state, equals(2));
     });
   });
 }

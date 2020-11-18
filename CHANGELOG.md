@@ -1,3 +1,7 @@
+# 0.0.1-dev.9
+
+- feat: add `FakeFlowController<T>` for verifying flow interactions
+
 # 0.0.1-dev.8
 
 - feat: `FlowBuilder` accepts an optional `FlowController<T>`
@@ -5,7 +9,7 @@
 
 # 0.0.1-dev.7
 
-- **BREAKING**: update `onGeneratePages` to include previous `pages`.
+- **BREAKING**: update `onGeneratePages` to include previous `pages`
 
 # 0.0.1-dev.6
 

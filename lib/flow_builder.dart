@@ -207,6 +207,41 @@ class FlowController<T> {
   final Complete<T> complete;
 }
 
+/// {@template fake_flow_controller}
+/// A concrete [FlowController] implementation that has no impact
+/// on flow navigation.
+///
+/// This implementation is intended to be used for testing purposes.
+/// {@endtemplate}
+class FakeFlowController<T> implements FlowController<T> {
+  /// {@macro fake_flow_controller}
+  FakeFlowController({@required T state}) : _state = state;
+
+  T _state;
+  bool _completed = false;
+
+  /// The current state of the flow.
+  T get state => _state;
+
+  /// Whether the flow has been completed.
+  bool get completed => _completed;
+
+  @override
+  Update<T> get update {
+    return (T Function(T) callback) {
+      _state = callback(_state);
+    };
+  }
+
+  @override
+  Complete<T> get complete {
+    return (T Function(T) callback) {
+      _completed = true;
+      _state = callback(_state);
+    };
+  }
+}
+
 class _ConditionalWillPopScope extends StatelessWidget {
   const _ConditionalWillPopScope({
     Key key,
