@@ -42,8 +42,12 @@ class FlowBuilder<T> extends StatefulWidget {
     @required this.onGeneratePages,
     this.onComplete,
     this.controller,
+    this.onPop,
   })  : assert(onGeneratePages != null),
         super(key: key);
+
+  /// Optional callback called when a pop event occurs
+  final void Function() onPop;
 
   /// Builds a [List<Page>] based on the current state.
   final OnGeneratePages<T> onGeneratePages;
@@ -135,7 +139,11 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
               _pages.removeLast();
             }
             setState(() {});
-            return route.didPop(result);
+            final didPop = route.didPop(result);
+            if (didPop) {
+              widget.onPop?.call();
+            }
+            return didPop;
           },
         ),
       ),
