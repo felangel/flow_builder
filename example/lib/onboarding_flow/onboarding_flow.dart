@@ -38,9 +38,7 @@ class Step1 extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          onPressed: () {
-            context.flow<OnboardingSteps>().complete((step) => step);
-          },
+          onPressed: () => context.flow<OnboardingSteps>().complete(),
         ),
       ),
       body: const Center(child: Text('Onboarding Step 1')),

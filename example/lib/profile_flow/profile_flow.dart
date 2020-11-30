@@ -41,9 +41,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          onPressed: () {
-            context.flow<Profile>().complete((profile) => profile);
-          },
+          onPressed: () => context.flow<Profile>().complete(),
         ),
         title: const Text('Name'),
       ),
