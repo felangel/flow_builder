@@ -232,6 +232,126 @@ void main() {
       expect(find.text('Result: 1'), findsOneWidget);
     });
 
+    testWidgets('complete terminates the flow with explicit same state',
+        (tester) async {
+      const startButtonKey = Key('__start_button__');
+      const completeButtonKey = Key('__complete_button__');
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return TextButton(
+                  key: startButtonKey,
+                  child: const Text('Button'),
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push<int>(
+                      MaterialPageRoute<int>(
+                        builder: (_) => FlowBuilder<int>(
+                          state: 0,
+                          onGeneratePages: (state, pages) {
+                            numBuilds++;
+                            return <Page>[
+                              MaterialPage<void>(
+                                child: Builder(
+                                  builder: (context) => TextButton(
+                                    key: completeButtonKey,
+                                    child: const Text('Button'),
+                                    onPressed: () =>
+                                        context.flow<int>().complete((s) => s),
+                                  ),
+                                ),
+                              ),
+                            ];
+                          },
+                        ),
+                      ),
+                    );
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(content: Text('Result: $result')),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(startButtonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 1);
+
+      await tester.tap(find.byKey(completeButtonKey));
+      await tester.pumpAndSettle();
+      await tester.pump();
+
+      expect(numBuilds, 1);
+      expect(find.text('Result: 0'), findsOneWidget);
+    });
+
+    testWidgets('complete terminates the flow with implicit same state',
+        (tester) async {
+      const startButtonKey = Key('__start_button__');
+      const completeButtonKey = Key('__complete_button__');
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return TextButton(
+                  key: startButtonKey,
+                  child: const Text('Button'),
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push<int>(
+                      MaterialPageRoute<int>(
+                        builder: (_) => FlowBuilder<int>(
+                          state: 0,
+                          onGeneratePages: (state, pages) {
+                            numBuilds++;
+                            return <Page>[
+                              MaterialPage<void>(
+                                child: Builder(
+                                  builder: (context) => TextButton(
+                                    key: completeButtonKey,
+                                    child: const Text('Button'),
+                                    onPressed: () =>
+                                        context.flow<int>().complete(),
+                                  ),
+                                ),
+                              ),
+                            ];
+                          },
+                        ),
+                      ),
+                    );
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(content: Text('Result: $result')),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(startButtonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 1);
+
+      await tester.tap(find.byKey(completeButtonKey));
+      await tester.pumpAndSettle();
+      await tester.pump();
+
+      expect(numBuilds, 1);
+      expect(find.text('Result: 0'), findsOneWidget);
+    });
+
     testWidgets('complete invokes onComplete', (tester) async {
       const startButtonKey = Key('__start_button__');
       const completeButtonKey = Key('__complete_button__');

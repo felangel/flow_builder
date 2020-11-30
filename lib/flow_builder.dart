@@ -226,7 +226,12 @@ class FlowController<T> {
   /// When [complete] is called, the flow is popped with the new flow state.
   void complete([T Function(T) callback]) {
     _completed = true;
-    _notifier.value = callback?.call(_notifier.value);
+    final state = callback?.call(_notifier.value) ?? _notifier.value;
+    if (state == _notifier.value) {
+      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+      _notifier.notifyListeners();
+    }
+    _notifier.value = state;
   }
 
   /// Register a closure to be called when the flow state changes.
