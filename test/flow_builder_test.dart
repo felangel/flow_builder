@@ -7,16 +7,40 @@ void main() {
   group('FlowBuilder', () {
     test('throws AssertionError when onGeneratePages is null', () async {
       expect(
-        () => FlowBuilder(onGeneratePages: null, state: null),
+        () => FlowBuilder(onGeneratePages: null, state: ''),
         throwsAssertionError,
       );
     });
 
-    test('does not throw when state is null', () async {
+    test('throws when state is null and controller is null', () async {
       expect(
         () => FlowBuilder(
           onGeneratePages: (dynamic _, List<Page> __) => [],
           state: null,
+          controller: null,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('throws when state and controller are both provided', () async {
+      expect(
+        () => FlowBuilder(
+          onGeneratePages: (dynamic _, List<Page> __) => [],
+          state: '',
+          controller: FlowController(''),
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('does not throw when state is null if controller is present',
+        () async {
+      expect(
+        () => FlowBuilder(
+          onGeneratePages: (dynamic _, List<Page> __) => [],
+          state: null,
+          controller: FlowController(''),
         ),
         isNot(throwsAssertionError),
       );
@@ -286,8 +310,9 @@ void main() {
                       body: TextButton(
                         key: buttonKey,
                         child: const Text('Button'),
-                        onPressed: () =>
-                            context.flow<int>().update((s) => s + 1),
+                        onPressed: () {
+                          context.flow<int>().update((s) => s + 1);
+                        },
                       ),
                     ),
                   ),
@@ -568,11 +593,10 @@ void main() {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
       const state = 0;
-      final controller = FakeFlowController<int>(state: state);
+      final controller = FakeFlowController<int>(state);
       await tester.pumpWidget(
         MaterialApp(
           home: FlowBuilder<int>(
-            state: state,
             controller: controller,
             onGeneratePages: (state, pages) {
               return <Page>[
@@ -616,13 +640,12 @@ void main() {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
       const button3Key = Key('__button3__');
-      FakeFlowController<int> controller;
+      var controller = FakeFlowController(0);
       await tester.pumpWidget(
         MaterialApp(
           home: StatefulBuilder(
             builder: (context, setState) {
               return FlowBuilder<int>(
-                state: 0,
                 controller: controller,
                 onGeneratePages: (state, pages) {
                   return <Page>[
@@ -649,9 +672,7 @@ void main() {
                               child: const Text('Button'),
                               onPressed: () {
                                 setState(() {
-                                  controller = FakeFlowController<int>(
-                                    state: 0,
-                                  );
+                                  controller = FakeFlowController<int>(0);
                                 });
                               },
                             ),

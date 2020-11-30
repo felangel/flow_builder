@@ -4,12 +4,6 @@ import 'dart:collection';
 
 import 'package:flutter/widgets.dart';
 
-/// Signature for [FlowController] `update` function.
-typedef Update<T> = void Function(T Function(T));
-
-/// Signature for [FlowController] `complete` function.
-typedef Complete<T> = void Function(T Function(T));
-
 /// Signature for function which generates a [List<Page>] given an input of [T]
 /// and the current [List<Page>].
 typedef OnGeneratePages<T> = List<Page> Function(T, List<Page>);
@@ -38,11 +32,19 @@ class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
   const FlowBuilder({
     Key key,
-    @required this.state,
+    this.state,
     @required this.onGeneratePages,
     this.onComplete,
     this.controller,
-  })  : assert(onGeneratePages != null),
+  })  : assert(
+          state != null || controller != null,
+          'requires either state or controller',
+        ),
+        assert(
+          !(state != null && controller != null),
+          'cannot provide controller and state',
+        ),
+        assert(onGeneratePages != null),
         super(key: key);
 
   /// Builds a [List<Page>] based on the current state.
@@ -66,16 +68,17 @@ class FlowBuilder<T> extends StatefulWidget {
 class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   final _history = ListQueue<T>();
   var _pages = <Page>[];
+  var _didPop = false;
   final _navigatorKey = GlobalKey<NavigatorState>();
   NavigatorState get _navigator => _navigatorKey.currentState;
+  T get _state => _controller._notifier.value;
   FlowController<T> _controller;
-  T _state;
 
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? FlowController._(_update, _complete);
-    _state = widget.state;
+    _controller = (widget.controller ?? FlowController(widget.state))
+      ..addListener(_listener);
     _pages = widget.onGeneratePages(_state, List.of(_pages));
     _history.add(_state);
   }
@@ -84,10 +87,10 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   void didUpdateWidget(covariant FlowBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
-      _controller = widget.controller ?? FlowController._(_update, _complete);
+      _controller = widget.controller ?? FlowController(_state);
     }
     if (oldWidget.state != widget.state) {
-      _state = widget.state;
+      _controller = widget.controller ?? FlowController(widget.state);
       _pages = widget.onGeneratePages(_state, List.of(_pages));
       _history
         ..clear()
@@ -95,22 +98,29 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     }
   }
 
-  void _complete(T Function(T) pop) {
-    final state = pop(_state);
-    if (widget.onComplete != null) {
-      widget.onComplete(state);
-      return;
-    }
-    Navigator.of(context).pop(state);
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_listener)
+      ..dispose();
+    super.dispose();
   }
 
-  void _update(T Function(T) update) {
-    final state = update(_state);
-    setState(() {
-      _state = state;
-      _pages = widget.onGeneratePages(_state, List.of(_pages));
-      _history.add(state);
-    });
+  void _listener() {
+    if (_controller._completed) {
+      if (widget.onComplete != null) {
+        return widget.onComplete(_state);
+      }
+      return Navigator.of(context).pop(_state);
+    }
+    if (!_didPop) {
+      setState(() {
+        _pages = widget.onGeneratePages(_state, List.of(_pages));
+        _history.add(_state);
+      });
+    } else {
+      _didPop = false;
+    }
   }
 
   @override
@@ -129,7 +139,8 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
           onPopPage: (route, dynamic result) {
             if (_history.length > 1) {
               _history.removeLast();
-              _state = _history.last;
+              _didPop = true;
+              _controller._notifier.value = _history.last;
             }
             if (_pages.length > 1) {
               _pages.removeLast();
@@ -189,7 +200,14 @@ extension FlowX on BuildContext {
 /// the current flow.
 /// {@endtemplate}
 class FlowController<T> {
-  const FlowController._(this.update, this.complete);
+  /// {@macro flow_controller}
+  FlowController(T state) : this._(ValueNotifier<T>(state));
+
+  FlowController._(this._notifier);
+
+  final ValueNotifier<T> _notifier;
+
+  bool _completed = false;
 
   /// [update] can be called to update the current flow state.
   /// [update] takes a closure which exposes the current flow state
@@ -197,14 +215,36 @@ class FlowController<T> {
   ///
   /// When [update] is called, the `builder` method of the corresponding
   /// [FlowBuilder] will be called with the new flow state.
-  final Update<T> update;
+  void update(T Function(T) callback) {
+    _notifier.value = callback(_notifier.value);
+  }
 
   /// [complete] can be called to complete the current flow.
   /// [complete] takes a closure which exposes the current flow state
   /// and is responsible for returning the new flow state.
   ///
   /// When [complete] is called, the flow is popped with the new flow state.
-  final Complete<T> complete;
+  void complete([T Function(T) callback]) {
+    _completed = true;
+    _notifier.value = callback?.call(_notifier.value);
+  }
+
+  /// Register a closure to be called when the flow state changes.
+  void addListener(VoidCallback listener) => _notifier.addListener(listener);
+
+  /// Remove a previously registered closure from the list of closures that the
+  /// object notifies.
+  void removeListener(VoidCallback listener) {
+    _notifier.removeListener(listener);
+  }
+
+  /// Discards any resources used by the object. After this is called, the
+  /// object is not in a usable state and should be discarded (calls to
+  /// [addListener] and [removeListener] will throw after the object is
+  /// disposed).
+  ///
+  /// This method should only be called by the object's owner.
+  void dispose() => _notifier.dispose();
 }
 
 /// {@template fake_flow_controller}
@@ -213,12 +253,13 @@ class FlowController<T> {
 ///
 /// This implementation is intended to be used for testing purposes.
 /// {@endtemplate}
-class FakeFlowController<T> implements FlowController<T> {
+class FakeFlowController<T> extends FlowController<T> {
   /// {@macro fake_flow_controller}
-  FakeFlowController({@required T state}) : _state = state;
+  FakeFlowController(T state)
+      : _state = state,
+        super(state);
 
   T _state;
-  bool _completed = false;
 
   /// The current state of the flow.
   T get state => _state;
@@ -227,18 +268,14 @@ class FakeFlowController<T> implements FlowController<T> {
   bool get completed => _completed;
 
   @override
-  Update<T> get update {
-    return (T Function(T) callback) {
-      _state = callback(_state);
-    };
+  void update(T Function(T) callback) {
+    _state = callback(_state);
   }
 
   @override
-  Complete<T> get complete {
-    return (T Function(T) callback) {
-      _completed = true;
-      _state = callback(_state);
-    };
+  void complete([T Function(T) callback]) {
+    _completed = true;
+    _state = callback(_state);
   }
 }
 

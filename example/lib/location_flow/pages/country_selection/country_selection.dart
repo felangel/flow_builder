@@ -29,9 +29,7 @@ class CountrySelectionForm extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          onPressed: () {
-            context.flow<Location>().complete((location) => location);
-          },
+          onPressed: () => context.flow<Location>().complete(),
         ),
         title: const Text('Country'),
       ),

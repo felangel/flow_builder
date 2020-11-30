@@ -1,3 +1,10 @@
+# 0.0.1-dev.10
+
+- **BREAKING** feat!: remove `Update` and `Complete` typedefs
+- feat: update `FlowController` to have a public constructor
+- feat: `FlowBuilder` requires either `state` or `controller`
+- feat: `FlowController` exposes `addListener`, `removeListener`, and `dispose`
+
 # 0.0.1-dev.9
 
 - feat: add `FakeFlowController<T>` for verifying flow interactions
