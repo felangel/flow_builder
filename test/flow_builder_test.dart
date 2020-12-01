@@ -468,6 +468,106 @@ void main() {
       expect(find.byKey(scaffoldKey), findsNothing);
     });
 
+    testWidgets('system back button pops parent route', (tester) async {
+      const buttonKey = Key('__button__');
+      const scaffoldKey = Key('__scaffold__');
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              numBuilds++;
+              return <Page>[
+                MaterialPage<void>(
+                  child: Builder(
+                    builder: (context) => Scaffold(
+                      body: TextButton(
+                        key: buttonKey,
+                        child: const Text('Button'),
+                        onPressed: () {
+                          context.flow<int>().update((s) => s + 1);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                if (state == 1)
+                  const MaterialPage<void>(
+                    child: Scaffold(key: scaffoldKey),
+                  ),
+              ];
+            },
+          ),
+        ),
+      );
+      expect(numBuilds, 1);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 2);
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(scaffoldKey), findsOneWidget);
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall('pushRoute'),
+      );
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall('popRoute'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 2);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+    });
+
+    testWidgets('system back button pops entire flow', (tester) async {
+      const buttonKey = Key('__button__');
+      const scaffoldKey = Key('__scaffold__');
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                MaterialPage<void>(
+                  child: Builder(
+                    builder: (context) => Scaffold(
+                      body: TextButton(
+                        key: buttonKey,
+                        child: const Text('Button'),
+                        onPressed: () {
+                          context.flow<int>().update((s) => s + 1);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall('popRoute'),
+      );
+      await tester.pumpAndSettle();
+
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall('popRoute'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(scaffoldKey), findsNothing);
+    });
+
     testWidgets('Navigator.pop pops parent route', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
@@ -664,6 +764,51 @@ void main() {
 
       expect(find.byKey(button1Key), findsOneWidget);
       expect(find.byType(WillPopScope), findsNothing);
+    });
+
+    testWidgets('controller change triggers a rebuild with correct state',
+        (tester) async {
+      const buttonKey = Key('__button__');
+      const boxKey = Key('__box__');
+      var numBuilds = 0;
+      var controller = FlowController(0);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StatefulBuilder(
+            builder: (context, setState) {
+              return FlowBuilder<int>(
+                controller: controller,
+                onGeneratePages: (state, pages) {
+                  numBuilds++;
+                  return <Page>[
+                    MaterialPage<void>(
+                      child: TextButton(
+                        key: buttonKey,
+                        child: const Text('Button'),
+                        onPressed: () => setState(
+                          () => controller = FlowController(1),
+                        ),
+                      ),
+                    ),
+                    if (state == 1)
+                      const MaterialPage<void>(child: SizedBox(key: boxKey)),
+                  ];
+                },
+              );
+            },
+          ),
+        ),
+      );
+      expect(numBuilds, 1);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(boxKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 2);
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(boxKey), findsOneWidget);
     });
 
     testWidgets('state change triggers a rebuild with correct state',
