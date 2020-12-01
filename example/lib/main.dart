@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:example/authentication_flow/authentication_flow.dart';
 import 'package:example/location_flow/location_flow.dart';
 import 'package:example/onboarding_flow/onboarding_flow.dart';
 import 'package:example/profile_flow/profile_flow.dart';
@@ -82,6 +83,23 @@ class Home extends StatelessWidget {
                     ..showSnackBar(
                       SnackBar(
                         content: Text('Location Flow Complete!\n$location'),
+                      ),
+                    );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.security_rounded),
+                title: const Text('Authentication Flow'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  await Navigator.of(context).push<AuthenticationState>(
+                    AuthenticationFlow.route(),
+                  );
+                  Scaffold.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        content: Text('Authentication Flow Complete!'),
                       ),
                     );
                 },

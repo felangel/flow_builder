@@ -2,6 +2,7 @@ library flow_builder;
 
 import 'dart:collection';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Signature for function which generates a [List<Page>] given an input of [T]
@@ -71,26 +72,31 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   var _didPop = false;
   final _navigatorKey = GlobalKey<NavigatorState>();
   NavigatorState get _navigator => _navigatorKey.currentState;
-  T get _state => _controller._notifier.value;
+  T get _state => _controller.state;
+  bool get _canPop => _pages.length > 1;
   FlowController<T> _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = (widget.controller ?? FlowController(widget.state))
-      ..addListener(_listener);
+    _SystemNavigationObserver.add(_pop);
+    _controller = _initController(widget.state);
     _pages = widget.onGeneratePages(_state, List.of(_pages));
     _history.add(_state);
   }
 
   @override
-  void didUpdateWidget(covariant FlowBuilder<T> oldWidget) {
+  void didUpdateWidget(FlowBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller ||
+        oldWidget.state != widget.state) {
+      _removeListeners(dispose: oldWidget.controller == null);
+    }
     if (oldWidget.controller != widget.controller) {
-      _controller = widget.controller ?? FlowController(_state);
+      _controller = widget.controller ?? _initController(widget.state);
     }
     if (oldWidget.state != widget.state) {
-      _controller = widget.controller ?? FlowController(widget.state);
+      _controller = _initController(widget.state);
       _pages = widget.onGeneratePages(_state, List.of(_pages));
       _history
         ..clear()
@@ -98,12 +104,35 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     }
   }
 
+  FlowController<T> _initController(T state) {
+    return _controller = (widget.controller ?? FlowController(state))
+      ..addListener(_listener);
+  }
+
+  void _removeListeners({@required bool dispose}) {
+    _controller.removeListener(_listener);
+    if (dispose) {
+      _controller.dispose();
+    }
+  }
+
   @override
   void dispose() {
-    _controller
-      ..removeListener(_listener)
-      ..dispose();
+    _SystemNavigationObserver.remove(_pop);
+    _removeListeners(dispose: widget.controller == null);
     super.dispose();
+  }
+
+  bool _pop() {
+    if (_canPop) {
+      _navigator.maybePop();
+      return true;
+    }
+    if (mounted) {
+      Navigator.of(context).pop(_state);
+      return true;
+    }
+    return false;
   }
 
   void _listener() {
@@ -111,16 +140,19 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       if (widget.onComplete != null) {
         return widget.onComplete(_state);
       }
-      return Navigator.of(context).pop(_state);
+      if (mounted) {
+        return Navigator.of(context).pop(_state);
+      }
     }
-    if (!_didPop) {
-      setState(() {
-        _pages = widget.onGeneratePages(_state, List.of(_pages));
-        _history.add(_state);
-      });
-    } else {
+    if (_didPop) {
       _didPop = false;
+      return;
     }
+
+    setState(() {
+      _pages = widget.onGeneratePages(_state, List.of(_pages));
+      _history.add(_state);
+    });
   }
 
   @override
@@ -128,7 +160,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     return _InheritedFlowController(
       controller: _controller,
       child: _ConditionalWillPopScope(
-        condition: _pages.length > 1,
+        condition: _canPop,
         onWillPop: () async {
           await _navigator.maybePop();
           return false;
@@ -207,6 +239,9 @@ class FlowController<T> {
 
   final ValueNotifier<T> _notifier;
 
+  /// The current state of the flow.
+  T get state => _notifier.value;
+
   bool _completed = false;
 
   /// [update] can be called to update the current flow state.
@@ -267,6 +302,7 @@ class FakeFlowController<T> extends FlowController<T> {
   T _state;
 
   /// The current state of the flow.
+  @override
   T get state => _state;
 
   /// Whether the flow has been completed.
@@ -299,5 +335,45 @@ class _ConditionalWillPopScope extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return condition ? WillPopScope(onWillPop: onWillPop, child: child) : child;
+  }
+}
+
+abstract class _SystemNavigationObserver implements WidgetsBinding {
+  static final _interceptors = ListQueue<ValueGetter<bool>>();
+
+  static void add(ValueGetter<bool> interceptor) {
+    _interceptors.addFirst(interceptor);
+    SystemChannels.navigation.setMethodCallHandler(_handleSystemNavigation);
+  }
+
+  static void remove(ValueGetter<bool> interceptor) {
+    _interceptors.remove(interceptor);
+  }
+
+  static Future<dynamic> _handleSystemNavigation(MethodCall methodCall) {
+    switch (methodCall.method) {
+      case 'popRoute':
+        return _popRoute();
+      default:
+        return Future<dynamic>.value();
+    }
+  }
+
+  static Future _popRoute() {
+    for (final interceptor in _interceptors) {
+      final preventDefault = interceptor();
+      if (preventDefault) return Future<dynamic>.value();
+    }
+
+    return WidgetsBinding.instance.handlePopRoute();
+  }
+}
+
+/// Visible for testing system navigation.
+abstract class TestSystemNavigationObserver {
+  /// Visible for testing system pop navigation.
+  @visibleForTesting
+  static Future<dynamic> handleSystemNavigation(MethodCall methodCall) {
+    return _SystemNavigationObserver._handleSystemNavigation(methodCall);
   }
 }
