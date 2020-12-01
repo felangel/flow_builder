@@ -301,7 +301,6 @@ class FakeFlowController<T> extends FlowController<T> {
 
   T _state;
 
-  /// The current state of the flow.
   @override
   T get state => _state;
 
