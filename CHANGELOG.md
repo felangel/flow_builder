@@ -5,6 +5,7 @@
 - feat: `FlowBuilder` requires either `state` or `controller`
 - feat: `FlowController` exposes `state`, `addListener`, `removeListener`, and `dispose`
 - fix: support hardware back functionality on Android within nested flows
+- docs: update `README` to include additional information around `FlowController` usage
 
 # 0.0.1-dev.9
 

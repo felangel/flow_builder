@@ -16,8 +16,10 @@
 
 ### Define a Flow State
 
+The flow state will be the state which drives the flow. Each time this state changes, a new navigation stack will be generated based on the new flow state.
+
 ```dart
-class Profile extends Equatable {
+class Profile {
   const Profile({this.name, this.age, this.weight});
 
   final String name;
@@ -31,13 +33,12 @@ class Profile extends Equatable {
       weight: weight ?? this.weight,
     );
   }
-
-  @override
-  List<Object> get props => [name, age, weight];
 }
 ```
 
-### Define a Flow
+### Create a FlowBuilder
+
+`FlowBuilder` is a widget which builds a navigation stack in response to changes in the flow state. `onGeneratePages` will be invoked for each state change and must return the new navigation stack as a list of pages.
 
 ```dart
 FlowBuilder<Profile>(
@@ -46,13 +47,14 @@ FlowBuilder<Profile>(
     return [
       MaterialPage(child: NameForm()),
       if (profile.name != null) MaterialPage(child: AgeForm()),
-      if (profile.age != null) MaterialPage(child: WeightForm()),
     ];
   },
 );
 ```
 
 ### Update the Flow State
+
+The state of the flow can be updated via `context.flow<T>().update`.
 
 ```dart
 class NameForm extends StatefulWidget {
@@ -95,44 +97,80 @@ class _NameFormState extends State<NameForm> {
 
 ### Complete the Flow
 
+The flow can be completed updated via `context.flow<T>().complete`.
+
 ```dart
-class WeightForm extends StatefulWidget {
+class AgeForm extends StatefulWidget {
   @override
-  _WeightFormState createState() => _WeightFormState();
+  _AgeFormState createState() => _AgeFormState();
 }
 
-class _WeightFormState extends State<WeightForm> {
-  int _weight;
+class _AgeFormState extends State<AgeForm> {
+  int _age;
 
   void _continuePressed() {
     context
         .flow<Profile>()
-        .complete((profile) => profile.copyWith(weight: _weight));
+        .complete((profile) => profile.copyWith(age: _age));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weight')),
+      appBar: AppBar(title: const Text('Age')),
       body: Center(
         child: Column(
           children: <Widget>[
             TextField(
-              onChanged: (value) => setState(() => _weight = int.parse(value)),
+              onChanged: (value) => setState(() => _age = int.parse(value)),
               decoration: InputDecoration(
-                labelText: 'Weight (lbs)',
-                hintText: '170',
+                labelText: 'Age',
+                hintText: '42',
               ),
               keyboardType: TextInputType.number,
             ),
             RaisedButton(
               child: const Text('Continue'),
-              onPressed: _weight != null ? _continuePressed : null,
+              onPressed: _age != null ? _continuePressed : null,
             )
           ],
         ),
       ),
     );
+  }
+}
+```
+
+## FlowController
+
+A `FlowBuilder` can also be created with a custom `FlowController` in cases where the flow can be manipulated outside of the sub-tree.
+
+```dart
+class MyFlow extends StatefulWidget {
+  @override
+  State<MyFlow> createState() => _MyFlowState();
+}
+
+class _MyFlowState extends State<MyFlow> {
+  FlowController<Profile> _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = FlowController(const Profile());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlowBuilder(
+      controller: _controller,
+      onGeneratePages: ...,
+    );
+  }
+
+  @override dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 ```
