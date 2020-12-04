@@ -1,3 +1,7 @@
+# 0.0.1-dev.11
+
+- feat: flow controller listenable
+
 # 0.0.1-dev.10
 
 - **BREAKING** feat!: remove `Update` and `Complete` typedefs
