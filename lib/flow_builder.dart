@@ -232,7 +232,7 @@ extension FlowX on BuildContext {
 /// A controller which exposes APIs to [update] and [complete]
 /// the current flow.
 /// {@endtemplate}
-class FlowController<T> {
+class FlowController<T> implements Listenable {
   /// {@macro flow_controller}
   FlowController(T state) : this._(ValueNotifier<T>(state));
 
@@ -271,10 +271,14 @@ class FlowController<T> {
   }
 
   /// Register a closure to be called when the flow state changes.
-  void addListener(VoidCallback listener) => _notifier.addListener(listener);
+  @override
+  void addListener(VoidCallback listener) {
+    _notifier.addListener(listener);
+  }
 
   /// Remove a previously registered closure from the list of closures that the
   /// object notifies.
+  @override
   void removeListener(VoidCallback listener) {
     _notifier.removeListener(listener);
   }
