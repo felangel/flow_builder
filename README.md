@@ -97,7 +97,7 @@ class _NameFormState extends State<NameForm> {
 
 ### Complete the Flow
 
-The flow can be completed updated via `context.flow<T>().complete`.
+The flow can be completed via `context.flow<T>().complete`.
 
 ```dart
 class AgeForm extends StatefulWidget {
