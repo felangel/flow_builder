@@ -12,8 +12,8 @@ export 'widgets/widgets.dart';
 List<Page> onGenerateLocationPages(Location state, List<Page> pages) {
   return [
     CountrySelection.page(),
-    if (state.country != null) StateSelection.page(country: state.country),
-    if (state.state != null) CitySelection.page(state: state.state),
+    if (state.country != null) StateSelection.page(country: state.country!),
+    if (state.state != null) CitySelection.page(state: state.state!),
   ];
 }
 

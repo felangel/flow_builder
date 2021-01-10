@@ -89,7 +89,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  FlowController<int> _controller;
+  late FlowController<int> _controller;
 
   @override
   void initState() {
@@ -126,7 +126,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 }
 
 class OnboardingStep extends StatelessWidget {
-  const OnboardingStep({Key key, this.step}) : super(key: key);
+  const OnboardingStep({Key? key, required this.step}) : super(key: key);
 
   static Page page(int step) {
     return MaterialPage<void>(child: OnboardingStep(step: step));

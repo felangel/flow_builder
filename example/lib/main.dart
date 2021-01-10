@@ -13,9 +13,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key key, @required LocationRepository locationRepository})
-      : assert(locationRepository != null),
-        _locationRepository = locationRepository,
+  MyApp({Key? key, required LocationRepository locationRepository})
+      : _locationRepository = locationRepository,
         super(key: key);
 
   final LocationRepository _locationRepository;

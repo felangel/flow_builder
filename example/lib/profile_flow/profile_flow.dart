@@ -75,7 +75,7 @@ class ProfileAgeForm extends StatefulWidget {
 }
 
 class _ProfileAgeFormState extends State<ProfileAgeForm> {
-  int _age;
+  int? _age;
 
   void _continuePressed() {
     context.flow<Profile>().update((profile) => profile.copyWith(age: _age));
@@ -116,7 +116,7 @@ class ProfileWeightForm extends StatefulWidget {
 }
 
 class _ProfileWeightFormState extends State<ProfileWeightForm> {
-  int _weight;
+  int? _weight;
 
   void _continuePressed() {
     context
@@ -158,11 +158,11 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
 class Profile extends Equatable {
   const Profile({this.name, this.age, this.weight});
 
-  final String name;
-  final int age;
-  final int weight;
+  final String? name;
+  final int? age;
+  final int? weight;
 
-  Profile copyWith({String name, int age, int weight}) {
+  Profile copyWith({String? name, int? age, int? weight}) {
     return Profile(
       name: name ?? this.name,
       age: age ?? this.age,
@@ -171,5 +171,5 @@ class Profile extends Equatable {
   }
 
   @override
-  List<Object> get props => [name, age, weight];
+  List<Object?> get props => [name, age, weight];
 }

@@ -9,25 +9,27 @@ class LocationRepository {
   Future<List<State>> getStates(String country) async {
     await _wait();
     final countryList = await countries();
-    final selectedCountry = countryList.firstWhere(
-      (element) => element.name == country,
-      orElse: () => null,
-    );
-    if (selectedCountry == null) return [];
-    final stateList = await states();
-    return stateList.where((s) => s.countryId == selectedCountry.id).toList();
+    try {
+      final selectedCountry =
+          countryList.firstWhere((element) => element.name == country);
+      final stateList = await states();
+      return stateList.where((s) => s.countryId == selectedCountry.id).toList();
+    } on StateError catch (_) {
+      return [];
+    }
   }
 
   Future<List<City>> getCities(String state) async {
     await _wait();
     final stateList = await states();
-    final selectedState = stateList.firstWhere(
-      (element) => element.name == state,
-      orElse: () => null,
-    );
-    if (selectedState == null) return [];
-    final cityList = await cities();
-    return cityList.where((s) => s.stateId == selectedState.id).toList();
+    try {
+      final selectedState =
+          stateList.firstWhere((element) => element.name == state);
+      final cityList = await cities();
+      return cityList.where((s) => s.stateId == selectedState.id).toList();
+    } on StateError catch (_) {
+      return [];
+    }
   }
 }
 

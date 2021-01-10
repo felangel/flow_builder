@@ -5,13 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('FlowBuilder', () {
-    test('throws AssertionError when onGeneratePages is null', () async {
-      expect(
-        () => FlowBuilder(onGeneratePages: null, state: ''),
-        throwsAssertionError,
-      );
-    });
-
     test('throws when state is null and controller is null', () async {
       expect(
         () => FlowBuilder(
@@ -208,7 +201,7 @@ void main() {
                         ),
                       ),
                     );
-                    Scaffold.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Result: $result')),
                     );
                   },
@@ -268,7 +261,7 @@ void main() {
                         ),
                       ),
                     );
-                    Scaffold.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Result: $result')),
                     );
                   },
@@ -328,7 +321,7 @@ void main() {
                         ),
                       ),
                     );
-                    Scaffold.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Result: $result')),
                     );
                   },
@@ -733,7 +726,7 @@ void main() {
       final willPopScope = tester.widget<WillPopScope>(
         find.byType(WillPopScope),
       );
-      final result = await willPopScope.onWillPop();
+      final result = await willPopScope.onWillPop!();
       expect(result, isFalse);
 
       await tester.pumpAndSettle();

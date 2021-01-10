@@ -1,3 +1,7 @@
+# 0.0.2-dev.0
+
+- **BREAKING**: feat!: added support for null-safety
+
 # 0.0.1-dev.13
 
 - fix: invoke `SystemNavigator.pop()` when `FlowBuilder` is at root

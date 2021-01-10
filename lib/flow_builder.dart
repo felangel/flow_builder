@@ -32,9 +32,9 @@ typedef OnGeneratePages<T> = List<Page> Function(T, List<Page>);
 class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
   const FlowBuilder({
-    Key key,
+    Key? key,
+    required this.onGeneratePages,
     this.state,
-    @required this.onGeneratePages,
     this.onComplete,
     this.controller,
   })  : assert(
@@ -45,7 +45,6 @@ class FlowBuilder<T> extends StatefulWidget {
           !(state != null && controller != null),
           'cannot provide controller and state',
         ),
-        assert(onGeneratePages != null),
         super(key: key);
 
   /// Builds a [List<Page>] based on the current state.
@@ -53,28 +52,29 @@ class FlowBuilder<T> extends StatefulWidget {
 
   /// Optional [ValueSetter<T>] which is invoked when the
   /// flow has been completed with the final flow state.
-  final ValueSetter<T> onComplete;
+  final ValueSetter<T>? onComplete;
 
   /// The state of the flow.
-  final T state;
+  final T? state;
 
   /// Optional [FlowController] which will be used in the current flow.
   /// If not provided, a [FlowController] instance will be created internally.
-  final FlowController<T> controller;
+  final FlowController<T>? controller;
 
   @override
   _FlowBuilderState<T> createState() => _FlowBuilderState<T>();
 }
 
 class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
+  late FlowController<T> _controller;
+
   final _history = ListQueue<T>();
   var _pages = <Page>[];
   var _didPop = false;
   final _navigatorKey = GlobalKey<NavigatorState>();
-  NavigatorState get _navigator => _navigatorKey.currentState;
+  NavigatorState? get _navigator => _navigatorKey.currentState;
   T get _state => _controller.state;
   bool get _canPop => _pages.length > 1;
-  FlowController<T> _controller;
 
   @override
   void initState() {
@@ -105,12 +105,12 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     }
   }
 
-  FlowController<T> _initController(T state) {
-    return _controller = (widget.controller ?? FlowController(state))
+  FlowController<T> _initController(T? state) {
+    return _controller = (widget.controller ?? FlowController(state!))
       ..addListener(_listener);
   }
 
-  void _removeListeners({@required bool dispose}) {
+  void _removeListeners({required bool dispose}) {
     _controller.removeListener(_listener);
     if (dispose) {
       _controller.dispose();
@@ -127,7 +127,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   Future<bool> _pop() async {
     if (mounted) {
       final navigator = _canPop ? _navigator : Navigator.of(context);
-      final willPop = await navigator.maybePop(_state);
+      final willPop = await navigator?.maybePop(_state) ?? false;
       return willPop;
     }
     return false;
@@ -136,7 +136,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   void _listener() {
     if (_controller._completed) {
       if (widget.onComplete != null) {
-        return widget.onComplete(_state);
+        return widget.onComplete!(_state);
       }
       if (mounted) {
         return Navigator.of(context).pop(_state);
@@ -160,7 +160,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       child: _ConditionalWillPopScope(
         condition: _canPop,
         onWillPop: () async {
-          await _navigator.maybePop();
+          await _navigator?.maybePop();
           return false;
         },
         child: Navigator(
@@ -186,9 +186,9 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
 class _InheritedFlowController<T> extends InheritedWidget {
   const _InheritedFlowController({
-    Key key,
-    @required this.controller,
-    @required Widget child,
+    Key? key,
+    required this.controller,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final FlowController<T> controller;
@@ -196,8 +196,8 @@ class _InheritedFlowController<T> extends InheritedWidget {
   static FlowController<T> of<T>(BuildContext context) {
     final inheritedFlowController = context
         .getElementForInheritedWidgetOfExactType<_InheritedFlowController<T>>()
-        ?.widget as _InheritedFlowController<T>;
-    if (inheritedFlowController?.controller == null) {
+        ?.widget as _InheritedFlowController<T>?;
+    if (inheritedFlowController == null) {
       throw FlutterError(
         '''
         context.flow<$T>() called with a context that does not contain a FlowBuilder of type $T.
@@ -257,7 +257,7 @@ class FlowController<T> implements Listenable {
   /// and is responsible for returning the new flow state.
   ///
   /// When [complete] is called, the flow is popped with the new flow state.
-  void complete([T Function(T) callback]) {
+  void complete([T Function(T)? callback]) {
     _completed = true;
     final state = callback?.call(_notifier.value) ?? _notifier.value;
     if (state == _notifier.value) {
@@ -315,7 +315,7 @@ class FakeFlowController<T> extends FlowController<T> {
   }
 
   @override
-  void complete([T Function(T) callback]) {
+  void complete([T Function(T)? callback]) {
     _completed = true;
     if (callback != null) {
       _state = callback(_state);
@@ -325,10 +325,10 @@ class FakeFlowController<T> extends FlowController<T> {
 
 class _ConditionalWillPopScope extends StatelessWidget {
   const _ConditionalWillPopScope({
-    Key key,
-    @required this.condition,
-    @required this.onWillPop,
-    @required this.child,
+    Key? key,
+    required this.condition,
+    required this.onWillPop,
+    required this.child,
   }) : super(key: key);
 
   final bool condition;
@@ -367,8 +367,7 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
       final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
     }
-
-    return WidgetsBinding.instance.handlePopRoute();
+    return WidgetsBinding.instance!.handlePopRoute();
   }
 }
 

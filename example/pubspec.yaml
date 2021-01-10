@@ -6,15 +6,22 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  equatable: ^1.2.5
+  equatable:
+    git:
+      url: git@github.com:felangel/equatable.git
+      ref: null_safety
   flow_builder:
     path: ../
-  flutter_bloc: ^6.1.0
+  flutter_bloc:
+    git:
+      url: git@github.com:felangel/bloc.git
+      ref: null_safety
+      path: packages/flutter_bloc
 
 flutter:
   uses-material-design: true

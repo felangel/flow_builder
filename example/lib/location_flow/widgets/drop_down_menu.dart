@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 class DropdownMenu extends StatelessWidget {
   const DropdownMenu({
-    Key key,
-    @required this.items,
-    @required this.onChanged,
+    Key? key,
+    required this.items,
+    required this.onChanged,
     this.value,
     this.hint,
   }) : super(key: key);
 
-  final Widget hint;
+  final Widget? hint;
   final List<String> items;
-  final String value;
-  final ValueSetter<String> onChanged;
+  final String? value;
+  final ValueSetter<String?> onChanged;
 
   @override
   Widget build(BuildContext context) {

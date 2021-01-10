@@ -48,9 +48,7 @@ class Step1 extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 0,
-            onPressed: () {
-              context.flow<OnboardingSteps>().complete((_) => null);
-            },
+            onPressed: context.flow<OnboardingSteps>().complete,
             child: const Icon(Icons.clear),
           ),
           const SizedBox(width: 8),
@@ -130,9 +128,7 @@ class Step3 extends StatelessWidget {
           const SizedBox(width: 8),
           FloatingActionButton(
             heroTag: 5,
-            onPressed: () {
-              context.flow<OnboardingSteps>().complete((_) => null);
-            },
+            onPressed: context.flow<OnboardingSteps>().complete,
             child: const Icon(Icons.check),
           ),
         ],
