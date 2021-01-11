@@ -11,17 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  equatable:
-    git:
-      url: git@github.com:felangel/equatable.git
-      ref: null_safety
+  equatable: ^2.0.0-nullsafety.1
   flow_builder:
     path: ../
-  flutter_bloc:
-    git:
-      url: git@github.com:felangel/bloc.git
-      ref: null_safety
-      path: packages/flutter_bloc
+  flutter_bloc: ^7.0.0-nullsafety.0
 
 flutter:
   uses-material-design: true
