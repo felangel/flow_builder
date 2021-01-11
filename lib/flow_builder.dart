@@ -72,7 +72,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   var _pages = <Page>[];
   var _didPop = false;
   final _navigatorKey = GlobalKey<NavigatorState>();
-  NavigatorState? get _navigator => _navigatorKey.currentState;
+  NavigatorState get _navigator => _navigatorKey.currentState!;
   T get _state => _controller.state;
   bool get _canPop => _pages.length > 1;
 
@@ -127,7 +127,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   Future<bool> _pop() async {
     if (mounted) {
       final navigator = _canPop ? _navigator : Navigator.of(context);
-      final willPop = await navigator?.maybePop(_state) ?? false;
+      final willPop = await navigator.maybePop(_state);
       return willPop;
     }
     return false;
@@ -160,7 +160,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       child: _ConditionalWillPopScope(
         condition: _canPop,
         onWillPop: () async {
-          await _navigator?.maybePop();
+          await _navigator.maybePop();
           return false;
         },
         child: Navigator(

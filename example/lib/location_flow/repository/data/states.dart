@@ -20503,8 +20503,8 @@ List<State> _parseStates(String states) {
       .map(
         (dynamic s) => State(
           s['name'] as String,
-          int.tryParse(s['id'] as String)!,
-          int.tryParse(s['country_id'] as String)!,
+          int.parse(s['id'] as String),
+          int.parse(s['country_id'] as String),
         ),
       )
       .toList();

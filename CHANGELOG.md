@@ -1,4 +1,4 @@
-# 0.0.2-dev.0
+# 0.0.1-nullsafety.0
 
 - **BREAKING**: feat!: added support for null-safety
 

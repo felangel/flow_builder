@@ -242098,8 +242098,8 @@ List<City> _parseCities(String cities) {
       .map(
         (dynamic s) => City(
           s['name'] as String,
-          int.tryParse(s['id'] as String)!,
-          int.tryParse(s['state_id'] as String)!,
+          int.parse(s['id'] as String),
+          int.parse(s['state_id'] as String),
         ),
       )
       .toList();

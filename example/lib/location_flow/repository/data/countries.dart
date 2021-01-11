@@ -1487,7 +1487,7 @@ Future<List<Country>> countries() => compute(_parseCountries, _countries);
 List<Country> _parseCountries(String countries) {
   return (json.decode(countries) as List)
       .map((dynamic c) =>
-          Country(c['name'] as String, int.tryParse(c['id'] as String)!))
+          Country(c['name'] as String, int.parse(c['id'] as String)))
       .toList();
 }
 
