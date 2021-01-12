@@ -48,7 +48,7 @@ class Step1 extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 0,
-            onPressed: context.flow<OnboardingSteps>().complete,
+            onPressed: () => context.flow<OnboardingSteps>().complete(),
             child: const Icon(Icons.clear),
           ),
           const SizedBox(width: 8),
