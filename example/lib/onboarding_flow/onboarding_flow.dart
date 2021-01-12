@@ -128,7 +128,7 @@ class Step3 extends StatelessWidget {
           const SizedBox(width: 8),
           FloatingActionButton(
             heroTag: 5,
-            onPressed: context.flow<OnboardingSteps>().complete,
+            onPressed: () => context.flow<OnboardingSteps>().complete(),
             child: const Icon(Icons.check),
           ),
         ],
