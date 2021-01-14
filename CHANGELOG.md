@@ -1,3 +1,7 @@
+# 0.0.1-dev.12
+
+- fix: `FakeFlowController` supports `complete` with no callback
+
 # 0.0.1-dev.11
 
 - feat: flow controller listenable

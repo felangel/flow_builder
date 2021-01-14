@@ -320,7 +320,9 @@ class FakeFlowController<T> extends FlowController<T> {
   @override
   void complete([T Function(T) callback]) {
     _completed = true;
-    _state = callback(_state);
+    if (callback != null) {
+      _state = callback(_state);
+    }
   }
 }
 

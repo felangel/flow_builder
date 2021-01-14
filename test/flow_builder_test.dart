@@ -901,6 +901,40 @@ void main() {
       expect(controller.state, equals(2));
     });
 
+    testWidgets('FakeFlowController supports complete with null callback',
+        (tester) async {
+      const buttonKey = Key('__button__');
+      const state = 0;
+      final controller = FakeFlowController<int>(state);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            controller: controller,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                MaterialPage<void>(
+                  child: Builder(
+                    builder: (context) => Column(
+                      children: [
+                        TextButton(
+                          key: buttonKey,
+                          child: const Text('Button'),
+                          onPressed: () => context.flow<int>().complete(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(buttonKey));
+      expect(controller.completed, isTrue);
+      expect(controller.state, equals(0));
+    });
+
     testWidgets('updates when FlowController changes', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
