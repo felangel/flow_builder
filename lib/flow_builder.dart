@@ -124,14 +124,11 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     super.dispose();
   }
 
-  bool _pop() {
-    if (_canPop) {
-      _navigator.maybePop();
-      return true;
-    }
+  Future<bool> _pop() async {
     if (mounted) {
-      Navigator.of(context).pop(_state);
-      return true;
+      final navigator = _canPop ? _navigator : Navigator.of(context);
+      final willPop = await navigator.maybePop(_state);
+      return willPop;
     }
     return false;
   }
@@ -345,14 +342,14 @@ class _ConditionalWillPopScope extends StatelessWidget {
 }
 
 abstract class _SystemNavigationObserver implements WidgetsBinding {
-  static final _interceptors = ListQueue<ValueGetter<bool>>();
+  static final _interceptors = ListQueue<ValueGetter<Future<bool>>>();
 
-  static void add(ValueGetter<bool> interceptor) {
+  static void add(ValueGetter<Future<bool>> interceptor) {
     _interceptors.addFirst(interceptor);
     SystemChannels.navigation.setMethodCallHandler(_handleSystemNavigation);
   }
 
-  static void remove(ValueGetter<bool> interceptor) {
+  static void remove(ValueGetter<Future<bool>> interceptor) {
     _interceptors.remove(interceptor);
   }
 
@@ -365,9 +362,9 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 
-  static Future _popRoute() {
+  static Future _popRoute() async {
     for (final interceptor in _interceptors) {
-      final preventDefault = interceptor();
+      final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
     }
 
