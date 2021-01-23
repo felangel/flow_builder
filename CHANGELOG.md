@@ -1,3 +1,8 @@
+# 0.0.1-dev.13
+
+- fix: invoke `SystemNavigator.pop()` when `FlowBuilder` is at root
+  - fixes cases where system back button presses result in a black screen on Android
+
 # 0.0.1-dev.12
 
 - fix: `FakeFlowController` supports `complete` with no callback

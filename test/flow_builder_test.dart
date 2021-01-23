@@ -525,6 +525,13 @@ void main() {
     });
 
     testWidgets('system back button pops entire flow', (tester) async {
+      var systemPopCallCount = 0;
+      SystemChannels.platform.setMockMethodCallHandler((call) {
+        if (call.method == 'SystemNavigator.pop') {
+          systemPopCallCount++;
+        }
+        return null;
+      });
       const buttonKey = Key('__button__');
       const scaffoldKey = Key('__scaffold__');
       await tester.pumpWidget(
@@ -535,15 +542,17 @@ void main() {
               return <Page>[
                 MaterialPage<void>(
                   child: Builder(
-                    builder: (context) => Scaffold(
-                      body: TextButton(
-                        key: buttonKey,
-                        child: const Text('Button'),
-                        onPressed: () {
-                          context.flow<int>().update((s) => s + 1);
-                        },
-                      ),
-                    ),
+                    builder: (context) {
+                      return Scaffold(
+                        body: TextButton(
+                          key: buttonKey,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            context.flow<int>().update((s) => s + 1);
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
               ];
@@ -559,13 +568,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('popRoute'),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(buttonKey), findsNothing);
-      expect(find.byKey(scaffoldKey), findsNothing);
+      expect(systemPopCallCount, equals(1));
     });
 
     testWidgets('Navigator.pop pops parent route', (tester) async {
