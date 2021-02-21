@@ -19,7 +19,7 @@ class StateSelectionCubit extends Cubit<LocationState> {
     }
   }
 
-  void stateSelected(String value) {
+  void stateSelected(String? value) {
     if (state.status == LocationStatus.success) {
       emit(state.copyWith(selectedLocation: value));
     }

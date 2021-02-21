@@ -60,13 +60,13 @@ class SplashPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Onboarding'),
               onPressed: () {
                 Navigator.of(context).push(OnboardingPage.route());
               },
             ),
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Sign In'),
               onPressed: () {
                 context.read<AuthenticationCubit>().login();
@@ -115,7 +115,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
       body: FlowBuilder<int>(
         controller: _controller,
         onGeneratePages: (int state, List<Page> pages) {
-          if (state < 0) return [OnboardingStep.page(0)];
           return [
             for (var i = 0; i <= state; i++) OnboardingStep.page(i),
           ];
@@ -129,7 +128,9 @@ class OnboardingStep extends StatelessWidget {
   const OnboardingStep({Key? key, required this.step}) : super(key: key);
 
   static Page page(int step) {
-    return MaterialPage<void>(child: OnboardingStep(step: step));
+    return MaterialPage<void>(
+      child: OnboardingStep(step: step),
+    );
   }
 
   final int step;

@@ -15,8 +15,8 @@ class LocationState extends Equatable {
       : this._(status: LocationStatus.success, locations: locations);
   const LocationState.failure() : this._(status: LocationStatus.failure);
 
-  final LocationStatus? status;
-  final List<String>? locations;
+  final LocationStatus status;
+  final List<String> locations;
   final String? selectedLocation;
 
   LocationState copyWith({String? selectedLocation}) {
