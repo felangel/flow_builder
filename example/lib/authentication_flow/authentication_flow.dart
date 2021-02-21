@@ -128,9 +128,7 @@ class OnboardingStep extends StatelessWidget {
   const OnboardingStep({Key? key, required this.step}) : super(key: key);
 
   static Page page(int step) {
-    return MaterialPage<void>(
-      child: OnboardingStep(step: step),
-    );
+    return MaterialPage<void>(child: OnboardingStep(step: step));
   }
 
   final int step;
