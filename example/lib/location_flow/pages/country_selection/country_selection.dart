@@ -46,11 +46,11 @@ class CountrySelectionForm extends StatelessWidget {
                   case LocationStatus.success:
                     return DropdownMenu(
                       hint: const Text('Select a Country'),
-                      items: state.locations,
+                      items: state.locations!,
                       value: state.selectedLocation,
                       onChanged: (value) => context
                           .read<CountrySelectionCubit>()
-                          .countrySelected(value),
+                          .countrySelected(value!),
                     );
                   default:
                     return LocationError();

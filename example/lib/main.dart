@@ -13,9 +13,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key key, @required LocationRepository locationRepository})
-      : assert(locationRepository != null),
-        _locationRepository = locationRepository,
+  MyApp({Key? key, required LocationRepository locationRepository})
+      : _locationRepository = locationRepository,
         super(key: key);
 
   final LocationRepository _locationRepository;
@@ -44,7 +43,7 @@ class Home extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   await Navigator.of(context).push(OnboardingFlow.route());
-                  Scaffold.of(context)
+                  ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       const SnackBar(
@@ -61,7 +60,7 @@ class Home extends StatelessWidget {
                   final profile = await Navigator.of(context).push(
                     ProfileFlow.route(),
                   );
-                  Scaffold.of(context)
+                  ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
@@ -78,7 +77,7 @@ class Home extends StatelessWidget {
                   final location = await Navigator.of(context).push(
                     LocationFlow.route(),
                   );
-                  Scaffold.of(context)
+                  ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
@@ -95,7 +94,7 @@ class Home extends StatelessWidget {
                   await Navigator.of(context).push<AuthenticationState>(
                     AuthenticationFlow.route(),
                   );
-                  Scaffold.of(context)
+                  ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       const SnackBar(

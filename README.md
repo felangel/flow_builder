@@ -22,11 +22,11 @@ The flow state will be the state which drives the flow. Each time this state cha
 class Profile {
   const Profile({this.name, this.age, this.weight});
 
-  final String name;
-  final int age;
-  final int weight;
+  final String? name;
+  final int? age;
+  final int? weight;
 
-  Profile copyWith({String name, int age, int weight}) {
+  Profile copyWith({String? name, int? age, int? weight}) {
     return Profile(
       name: name ?? this.name,
       age: age ?? this.age,

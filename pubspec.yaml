@@ -3,10 +3,10 @@ description: Flutter Flows made easy! A Flutter package which simplifies flows w
 repository: https://github.com/felangel/flow_builder
 homepage: https://github.com/felangel/flow_builder
 
-version: 0.0.1-dev.13
+version: 0.0.1-nullsafety.0
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
 
 dependencies:
   flutter:

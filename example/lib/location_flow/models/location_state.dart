@@ -15,11 +15,11 @@ class LocationState extends Equatable {
       : this._(status: LocationStatus.success, locations: locations);
   const LocationState.failure() : this._(status: LocationStatus.failure);
 
-  final LocationStatus status;
-  final List<String> locations;
-  final String selectedLocation;
+  final LocationStatus? status;
+  final List<String>? locations;
+  final String? selectedLocation;
 
-  LocationState copyWith({String selectedLocation}) {
+  LocationState copyWith({String? selectedLocation}) {
     return LocationState._(
       locations: locations,
       status: status,
@@ -28,5 +28,5 @@ class LocationState extends Equatable {
   }
 
   @override
-  List<Object> get props => [status, locations, selectedLocation];
+  List<Object?> get props => [status, locations, selectedLocation];
 }

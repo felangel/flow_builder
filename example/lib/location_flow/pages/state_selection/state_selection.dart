@@ -6,9 +6,9 @@ import 'package:flow_builder/flow_builder.dart';
 import 'state_selection_cubit.dart';
 
 class StateSelection extends StatelessWidget {
-  const StateSelection({Key key, @required this.country}) : super(key: key);
+  const StateSelection({Key? key, required this.country}) : super(key: key);
 
-  static MaterialPage<void> page({@required String country}) {
+  static MaterialPage<void> page({required String country}) {
     return MaterialPage<void>(child: StateSelection(country: country));
   }
 
@@ -44,11 +44,11 @@ class StateSelectionForm extends StatelessWidget {
                   case LocationStatus.success:
                     return DropdownMenu(
                       hint: const Text('Select a State'),
-                      items: state.locations,
+                      items: state.locations!,
                       value: state.selectedLocation,
                       onChanged: (value) => context
                           .read<StateSelectionCubit>()
-                          .stateSelected(value),
+                          .stateSelected(value!),
                     );
                   default:
                     return LocationError();
