@@ -57,7 +57,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
                   hintText: 'John Doe',
                 ),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Continue'),
                 onPressed: _name.isNotEmpty ? _continuePressed : null,
               )
@@ -98,7 +98,7 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Continue'),
                 onPressed: _age != null ? _continuePressed : null,
               )
@@ -143,7 +143,7 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Continue'),
                 onPressed: _weight != null ? _continuePressed : null,
               )

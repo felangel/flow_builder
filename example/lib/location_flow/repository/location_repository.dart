@@ -9,8 +9,9 @@ class LocationRepository {
   Future<List<State>> getStates(String country) async {
     await _wait();
     final countryList = await countries();
-    final selectedCountry =
-        countryList.firstWhere((element) => element.name == country);
+    final selectedCountry = countryList.firstWhere(
+      (element) => element.name == country,
+    );
     final stateList = await states();
     return stateList.where((s) => s.countryId == selectedCountry.id).toList();
   }
@@ -18,8 +19,9 @@ class LocationRepository {
   Future<List<City>> getCities(String state) async {
     await _wait();
     final stateList = await states();
-    final selectedState =
-        stateList.firstWhere((element) => element.name == state);
+    final selectedState = stateList.firstWhere(
+      (element) => element.name == state,
+    );
     final cityList = await cities();
     return cityList.where((s) => s.stateId == selectedState.id).toList();
   }
