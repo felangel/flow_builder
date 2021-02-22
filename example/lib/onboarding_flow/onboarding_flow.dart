@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flow_builder/flow_builder.dart';
 
+const _onboardingInfoTag = 'onboarding_info';
+
 List<Page> onGenerateOnboardingPages(OnboardingSteps state, List<Page> pages) {
   switch (state) {
     case OnboardingSteps.step1:
@@ -23,7 +25,8 @@ class OnboardingFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const FlowBuilder<OnboardingSteps>(
+    return FlowBuilder<OnboardingSteps>(
+      observers: [HeroController()],
       state: OnboardingSteps.step1,
       onGeneratePages: onGenerateOnboardingPages,
     );
@@ -31,17 +34,32 @@ class OnboardingFlow extends StatelessWidget {
 }
 
 class Step1 extends StatelessWidget {
-  static MaterialPage<void> page() => MaterialPage<void>(child: Step1());
+  static Page<void> page() => MyPage<void>(child: Step1());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue,
       appBar: AppBar(
         leading: BackButton(
           onPressed: () => context.flow<OnboardingSteps>().complete(),
         ),
       ),
-      body: const Center(child: Text('Onboarding Step 1')),
+      body: Stack(
+        children: [
+          const Center(child: Text('Onboarding Step 1')),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: FloatingActionButton(
+              heroTag: _onboardingInfoTag,
+              backgroundColor: Colors.orange,
+              child: const Icon(Icons.info),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -68,13 +86,28 @@ class Step1 extends StatelessWidget {
 }
 
 class Step2 extends StatelessWidget {
-  static MaterialPage<void> page() => MaterialPage<void>(child: Step2());
+  static Page<void> page() => MyPage<void>(child: Step2());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       appBar: AppBar(),
-      body: const Center(child: Text('Onboarding Step 2')),
+      body: Stack(
+        children: [
+          const Center(child: Text('Onboarding Step 2')),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: FloatingActionButton(
+              heroTag: _onboardingInfoTag,
+              backgroundColor: Colors.orange,
+              child: const Icon(Icons.info),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -105,13 +138,28 @@ class Step2 extends StatelessWidget {
 }
 
 class Step3 extends StatelessWidget {
-  static MaterialPage<void> page() => MaterialPage<void>(child: Step3());
+  static Page<void> page() => MyPage<void>(child: Step3());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.orange,
       appBar: AppBar(),
-      body: const Center(child: Text('Onboarding Step 3')),
+      body: Stack(
+        children: [
+          const Center(child: Text('Onboarding Step 3')),
+          Positioned(
+            bottom: 40,
+            left: 10,
+            child: FloatingActionButton(
+              heroTag: _onboardingInfoTag,
+              backgroundColor: Colors.orange,
+              child: const Icon(Icons.info),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -133,6 +181,26 @@ class Step3 extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MyPage<T> extends Page<T> {
+  const MyPage({required this.child, LocalKey? key}) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Route<T> createRoute(BuildContext context) {
+    return PageRouteBuilder(
+      settings: this,
+      pageBuilder: (
+        BuildContext context,
+        Animation<double> animation,
+        Animation<double> secondaryAnimation,
+      ) {
+        return FadeTransition(opacity: animation, child: child);
+      },
     );
   }
 }
