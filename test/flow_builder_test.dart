@@ -991,5 +991,23 @@ void main() {
       expect(controller.completed, isTrue);
       expect(controller.state, equals(2));
     });
+
+    testWidgets('accepts custom navigator observers', (tester) async {
+      final observers = [NavigatorObserver(), HeroController()];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            observers: observers,
+            onGeneratePages: (state, pages) {
+              return const <Page>[MaterialPage<void>(child: SizedBox())];
+            },
+          ),
+        ),
+      );
+
+      final navigators = tester.widgetList<Navigator>(find.byType(Navigator));
+      expect(navigators.last.observers, equals(observers));
+    });
   });
 }

@@ -37,6 +37,7 @@ class FlowBuilder<T> extends StatefulWidget {
     this.state,
     this.onComplete,
     this.controller,
+    this.observers = const <NavigatorObserver>[],
   })  : assert(
           state != null || controller != null,
           'requires either state or controller',
@@ -60,6 +61,9 @@ class FlowBuilder<T> extends StatefulWidget {
   /// Optional [FlowController] which will be used in the current flow.
   /// If not provided, a [FlowController] instance will be created internally.
   final FlowController<T>? controller;
+
+  /// A list of [NavigatorObserver] for this [FlowBuilder].
+  final List<NavigatorObserver> observers;
 
   @override
   _FlowBuilderState<T> createState() => _FlowBuilderState<T>();
@@ -166,6 +170,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
         child: Navigator(
           key: _navigatorKey,
           pages: _pages,
+          observers: widget.observers,
           onPopPage: (route, dynamic result) {
             if (_history.length > 1) {
               _history.removeLast();
