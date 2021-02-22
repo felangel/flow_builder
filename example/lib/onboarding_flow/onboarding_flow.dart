@@ -1,64 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:flow_builder/flow_builder.dart';
 
-const _onboardingInfoTag = 'onboarding_info';
+const _onboardingInfoHeroTag = '__onboarding_info_hero_tag__';
 
-List<Page> onGenerateOnboardingPages(OnboardingSteps state, List<Page> pages) {
+enum OnboardingState {
+  initial,
+  welcomeComplete,
+  usageComplete,
+  onboardingComplete,
+}
+
+List<Page> onGenerateOnboardingPages(OnboardingState state, List<Page> pages) {
   switch (state) {
-    case OnboardingSteps.step1:
-      return [Step1.page()];
-    case OnboardingSteps.step2:
-      return [Step1.page(), Step2.page()];
-    case OnboardingSteps.step3:
-      return [Step1.page(), Step2.page(), Step3.page()];
+    case OnboardingState.usageComplete:
+      return [
+        OnboardingWelcome.page(),
+        OnboardingUsage.page(),
+        OnboardingComplete.page(),
+      ];
+    case OnboardingState.welcomeComplete:
+      return [
+        OnboardingWelcome.page(),
+        OnboardingUsage.page(),
+      ];
+    case OnboardingState.initial:
     default:
-      return [Step1.page()];
+      return [OnboardingWelcome.page()];
   }
 }
 
-enum OnboardingSteps { step1, step2, step3 }
-
 class OnboardingFlow extends StatelessWidget {
-  static Route<void> route() {
+  static Route<OnboardingState> route() {
     return MaterialPageRoute(builder: (_) => OnboardingFlow());
   }
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<OnboardingSteps>(
+    return FlowBuilder(
+      state: OnboardingState.initial,
       observers: [HeroController()],
-      state: OnboardingSteps.step1,
       onGeneratePages: onGenerateOnboardingPages,
     );
   }
 }
 
-class Step1 extends StatelessWidget {
-  static Page<void> page() => MyPage<void>(child: Step1());
+class OnboardingWelcome extends StatelessWidget {
+  static Page page() => MyPage<void>(child: OnboardingWelcome());
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.yellow,
       appBar: AppBar(
         leading: BackButton(
-          onPressed: () => context.flow<OnboardingSteps>().complete(),
+          onPressed: () => context.flow<OnboardingState>().complete(),
         ),
+        title: const Text('Welcome'),
       ),
-      body: Stack(
-        children: [
-          const Center(child: Text('Onboarding Step 1')),
-          Positioned(
-            top: 10,
-            right: 10,
-            child: FloatingActionButton(
-              heroTag: _onboardingInfoTag,
-              backgroundColor: Colors.orange,
-              child: const Icon(Icons.info),
-              onPressed: () {},
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Welcome Text',
+                    style: theme.textTheme.headline3,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 10,
+              right: 10,
+              child: FloatingActionButton(
+                heroTag: _onboardingInfoHeroTag,
+                backgroundColor: Colors.orange,
+                child: const Icon(Icons.info),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -66,7 +92,7 @@ class Step1 extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 0,
-            onPressed: () => context.flow<OnboardingSteps>().complete(),
+            onPressed: () => context.flow<OnboardingState>().complete(),
             child: const Icon(Icons.clear),
           ),
           const SizedBox(width: 8),
@@ -74,8 +100,8 @@ class Step1 extends StatelessWidget {
             heroTag: 1,
             onPressed: () {
               context
-                  .flow<OnboardingSteps>()
-                  .update((previous) => OnboardingSteps.step2);
+                  .flow<OnboardingState>()
+                  .update((_) => OnboardingState.welcomeComplete);
             },
             child: const Icon(Icons.arrow_forward_ios_rounded),
           ),
@@ -85,28 +111,42 @@ class Step1 extends StatelessWidget {
   }
 }
 
-class Step2 extends StatelessWidget {
-  static Page<void> page() => MyPage<void>(child: Step2());
+class OnboardingUsage extends StatelessWidget {
+  static Page page() => MyPage<void>(child: OnboardingUsage());
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: Colors.green,
-      appBar: AppBar(),
-      body: Stack(
-        children: [
-          const Center(child: Text('Onboarding Step 2')),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: FloatingActionButton(
-              heroTag: _onboardingInfoTag,
-              backgroundColor: Colors.orange,
-              child: const Icon(Icons.info),
-              onPressed: () {},
+      appBar: AppBar(title: const Text('Usage')),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Usage Text',
+                    style: theme.textTheme.headline3,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 10,
+              left: 10,
+              child: FloatingActionButton(
+                heroTag: _onboardingInfoHeroTag,
+                backgroundColor: Colors.orange,
+                child: const Icon(Icons.info),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -116,8 +156,8 @@ class Step2 extends StatelessWidget {
             heroTag: 2,
             onPressed: () {
               context
-                  .flow<OnboardingSteps>()
-                  .update((_) => OnboardingSteps.step1);
+                  .flow<OnboardingState>()
+                  .update((_) => OnboardingState.initial);
             },
             child: const Icon(Icons.arrow_back_ios_rounded),
           ),
@@ -126,8 +166,8 @@ class Step2 extends StatelessWidget {
             heroTag: 3,
             onPressed: () {
               context
-                  .flow<OnboardingSteps>()
-                  .update((_) => OnboardingSteps.step3);
+                  .flow<OnboardingState>()
+                  .update((_) => OnboardingState.usageComplete);
             },
             child: const Icon(Icons.arrow_forward_ios_rounded),
           ),
@@ -137,28 +177,43 @@ class Step2 extends StatelessWidget {
   }
 }
 
-class Step3 extends StatelessWidget {
-  static Page<void> page() => MyPage<void>(child: Step3());
+class OnboardingComplete extends StatelessWidget {
+  static Page page() => MyPage<void>(child: OnboardingComplete());
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.orange,
-      appBar: AppBar(),
-      body: Stack(
-        children: [
-          const Center(child: Text('Onboarding Step 3')),
-          Positioned(
-            bottom: 40,
-            left: 10,
-            child: FloatingActionButton(
-              heroTag: _onboardingInfoTag,
-              backgroundColor: Colors.orange,
-              child: const Icon(Icons.info),
-              onPressed: () {},
+      backgroundColor: Colors.pink,
+      appBar: AppBar(title: const Text('Complete')),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'All Done!',
+                    style: theme.textTheme.headline3,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 30,
+              left: 10,
+              child: FloatingActionButton(
+                heroTag: _onboardingInfoHeroTag,
+                backgroundColor: Colors.orange,
+                child: const Icon(Icons.info),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -168,15 +223,17 @@ class Step3 extends StatelessWidget {
             heroTag: 4,
             onPressed: () {
               context
-                  .flow<OnboardingSteps>()
-                  .update((_) => OnboardingSteps.step2);
+                  .flow<OnboardingState>()
+                  .update((_) => OnboardingState.welcomeComplete);
             },
             child: const Icon(Icons.arrow_back_ios_rounded),
           ),
           const SizedBox(width: 8),
           FloatingActionButton(
             heroTag: 5,
-            onPressed: () => context.flow<OnboardingSteps>().complete(),
+            onPressed: () => context
+                .flow<OnboardingState>()
+                .complete((_) => OnboardingState.onboardingComplete),
             child: const Icon(Icons.check),
           ),
         ],
