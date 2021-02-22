@@ -1,3 +1,7 @@
+# 0.0.1
+
+- **BREAKING**: feat!: added support for null-safety
+
 # 0.0.1-nullsafety.0
 
 - **BREAKING**: feat!: added support for null-safety
