@@ -106,7 +106,7 @@ class AgeForm extends StatefulWidget {
 }
 
 class _AgeFormState extends State<AgeForm> {
-  int _age;
+  int? _age;
 
   void _continuePressed() {
     context
@@ -152,7 +152,7 @@ class MyFlow extends StatefulWidget {
 }
 
 class _MyFlowState extends State<MyFlow> {
-  FlowController<Profile> _controller;
+  late FlowController<Profile> _controller;
 
   @override
   void initState() {

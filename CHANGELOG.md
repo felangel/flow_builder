@@ -1,3 +1,10 @@
+# 0.0.1
+
+- **BREAKING**: feat!: added support for null-safety
+- feat: `FlowBuilder` supports `List<NavigatorObserver>`
+- docs: update example to include custom page transitions
+- docs: update example to include hero animations
+
 # 0.0.1-nullsafety.0
 
 - **BREAKING**: feat!: added support for null-safety
