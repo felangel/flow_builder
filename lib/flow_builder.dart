@@ -92,21 +92,21 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   @override
   void didUpdateWidget(FlowBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    final _shouldDispose = oldWidget.controller == null;
+
+    _removeListeners(dispose: _shouldDispose);
+
     if (oldWidget.state != widget.state) {
-      _removeListeners(dispose: oldWidget.controller == null);
       _controller = _initController(widget.state);
-      _pages = widget.onGeneratePages(_state, List.of(_pages));
-      _history
-        ..clear()
-        ..add(_state);
     } else if (oldWidget.controller != widget.controller) {
-      _removeListeners(dispose: oldWidget.controller == null);
       _controller = widget.controller ?? _initController(_controller.state);
-      _pages = widget.onGeneratePages(_state, List.of(_pages));
-      _history
-        ..clear()
-        ..add(_state);
     }
+
+    _pages = widget.onGeneratePages(_state, List.of(_pages));
+    _history
+      ..clear()
+      ..add(_state);
   }
 
   FlowController<T> _initController(T? state) {
