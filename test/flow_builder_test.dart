@@ -625,6 +625,43 @@ void main() {
       expect(find.byKey(button2Key), findsNothing);
     });
 
+    testWidgets(
+        'system pushRoute is passed to WidgetsBinding if contains arguments',
+        (tester) async {
+      final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
+      final observer = _TestPushWidgetsBindingObserver();
+      const path = '/path';
+      widgetsBinding.addObserver(observer);
+
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              numBuilds++;
+              return <Page>[
+                const MaterialPage<void>(
+                  child: Scaffold(),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      expect(numBuilds, 1);
+
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall(
+          'pushRoute',
+          path,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(observer.lastRoute, path);
+      expect(observer.pushCount, 1);
+    });
+
     testWidgets('system pop does not terminate flow', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
@@ -1010,4 +1047,15 @@ void main() {
       expect(navigators.last.observers, equals(observers));
     });
   });
+}
+
+class _TestPushWidgetsBindingObserver with WidgetsBindingObserver {
+  int pushCount = 0;
+  String? lastRoute;
+  @override
+  Future<bool> didPushRoute(String route) async {
+    lastRoute = route;
+    pushCount++;
+    return true;
+  }
 }

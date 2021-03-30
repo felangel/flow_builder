@@ -1,3 +1,7 @@
+# 0.0.2
+
+- fix: don't lose system push events and pass them to WidgetsBindings
+
 # 0.0.1
 
 - **BREAKING**: feat!: added support for null-safety

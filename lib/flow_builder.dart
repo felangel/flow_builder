@@ -362,6 +362,8 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     switch (methodCall.method) {
       case 'popRoute':
         return _popRoute();
+      case 'pushRoute':
+        return _pushRoute(methodCall.arguments);
       default:
         return Future<dynamic>.value();
     }
@@ -373,6 +375,14 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
       if (preventDefault) return Future<dynamic>.value();
     }
     return WidgetsBinding.instance!.handlePopRoute();
+  }
+
+  static Future _pushRoute(dynamic arguments) async {
+    if (arguments is String) {
+      return WidgetsBinding.instance!.handlePushRoute(arguments);
+    } else {
+      return Future<dynamic>.value();
+    }
   }
 }
 
