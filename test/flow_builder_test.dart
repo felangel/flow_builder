@@ -698,6 +698,41 @@ void main() {
       expect(observer.pushCount, 0);
     });
 
+    testWidgets('other system navigation calls are not handled',
+        (tester) async {
+      final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
+      final observer = _TestPushWidgetsBindingObserver();
+      widgetsBinding.addObserver(observer);
+
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              numBuilds++;
+              return <Page>[
+                const MaterialPage<void>(
+                  child: Scaffold(),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      expect(numBuilds, 1);
+
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall(
+          'randomMethod',
+          null,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(observer.lastRoute, isNull);
+      expect(observer.pushCount, 0);
+    });
+
     testWidgets('system pop does not terminate flow', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
