@@ -625,112 +625,117 @@ void main() {
       expect(find.byKey(button2Key), findsNothing);
     });
 
-    testWidgets(
-        'system pushRoute is passed to WidgetsBinding if contains arguments',
-        (tester) async {
-      final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
-      final observer = _TestPushWidgetsBindingObserver();
-      const path = '/path';
-      widgetsBinding.addObserver(observer);
+    group('pushRoute', () {
+      testWidgets(
+          'system pushRoute is passed to WidgetsBinding if contains arguments',
+          (tester) async {
+        final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
+        final observer = _TestPushWidgetsBindingObserver();
+        const path = '/path';
+        widgetsBinding.addObserver(observer);
 
-      var numBuilds = 0;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: FlowBuilder<int>(
-            state: 0,
-            onGeneratePages: (state, pages) {
-              numBuilds++;
-              return <Page>[
-                const MaterialPage<void>(
-                  child: Scaffold(),
-                ),
-              ];
-            },
+        var numBuilds = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: FlowBuilder<int>(
+              state: 0,
+              onGeneratePages: (state, pages) {
+                numBuilds++;
+                return <Page>[
+                  const MaterialPage<void>(
+                    child: Scaffold(),
+                  ),
+                ];
+              },
+            ),
           ),
-        ),
-      );
-      expect(numBuilds, 1);
+        );
+        expect(numBuilds, 1);
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall(
-          'pushRoute',
-          path,
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(observer.lastRoute, path);
-      expect(observer.pushCount, 1);
-    });
-
-    testWidgets(
-        'system pushRoute is not passed to WidgetsBinding if empty arguments',
-        (tester) async {
-      final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
-      final observer = _TestPushWidgetsBindingObserver();
-      widgetsBinding.addObserver(observer);
-
-      var numBuilds = 0;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: FlowBuilder<int>(
-            state: 0,
-            onGeneratePages: (state, pages) {
-              numBuilds++;
-              return <Page>[
-                const MaterialPage<void>(
-                  child: Scaffold(),
-                ),
-              ];
-            },
+        await TestSystemNavigationObserver.handleSystemNavigation(
+          const MethodCall(
+            'pushRoute',
+            path,
           ),
-        ),
-      );
-      expect(numBuilds, 1);
+        );
+        await tester.pumpAndSettle();
+        expect(observer.lastRoute, path);
+        expect(observer.pushCount, 1);
+        widgetsBinding.removeObserver(observer);
+      });
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall(
-          'pushRoute',
-          null,
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(observer.lastRoute, isNull);
-      expect(observer.pushCount, 0);
-    });
+      testWidgets(
+          'system pushRoute is not passed to WidgetsBinding if empty arguments',
+          (tester) async {
+        final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
+        final observer = _TestPushWidgetsBindingObserver();
+        widgetsBinding.addObserver(observer);
 
-    testWidgets('other system navigation calls are not handled',
-        (tester) async {
-      final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
-      final observer = _TestPushWidgetsBindingObserver();
-      widgetsBinding.addObserver(observer);
-
-      var numBuilds = 0;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: FlowBuilder<int>(
-            state: 0,
-            onGeneratePages: (state, pages) {
-              numBuilds++;
-              return <Page>[
-                const MaterialPage<void>(
-                  child: Scaffold(),
-                ),
-              ];
-            },
+        var numBuilds = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: FlowBuilder<int>(
+              state: 0,
+              onGeneratePages: (state, pages) {
+                numBuilds++;
+                return <Page>[
+                  const MaterialPage<void>(
+                    child: Scaffold(),
+                  ),
+                ];
+              },
+            ),
           ),
-        ),
-      );
-      expect(numBuilds, 1);
+        );
+        expect(numBuilds, 1);
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall(
-          'randomMethod',
-          null,
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(observer.lastRoute, isNull);
-      expect(observer.pushCount, 0);
+        await TestSystemNavigationObserver.handleSystemNavigation(
+          const MethodCall(
+            'pushRoute',
+            null,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(observer.lastRoute, isNull);
+        expect(observer.pushCount, 0);
+        widgetsBinding.removeObserver(observer);
+      });
+
+      testWidgets('other system navigation calls are not handled',
+          (tester) async {
+        final widgetsBinding = TestWidgetsFlutterBinding.ensureInitialized();
+        final observer = _TestPushWidgetsBindingObserver();
+        widgetsBinding.addObserver(observer);
+
+        var numBuilds = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: FlowBuilder<int>(
+              state: 0,
+              onGeneratePages: (state, pages) {
+                numBuilds++;
+                return <Page>[
+                  const MaterialPage<void>(
+                    child: Scaffold(),
+                  ),
+                ];
+              },
+            ),
+          ),
+        );
+        expect(numBuilds, 1);
+
+        await TestSystemNavigationObserver.handleSystemNavigation(
+          const MethodCall(
+            'randomMethod',
+            null,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(observer.lastRoute, isNull);
+        expect(observer.pushCount, 0);
+        widgetsBinding.removeObserver(observer);
+      });
     });
 
     testWidgets('system pop does not terminate flow', (tester) async {
