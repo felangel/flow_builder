@@ -1,6 +1,8 @@
 # 0.0.2
 
 - fix: don't lose system push events and pass them to WidgetsBindings
+- fix: android back button pops the whole flow instead of popping pushed routes
+- feat: add web/desktop support to example app
 
 # 0.0.1
 
