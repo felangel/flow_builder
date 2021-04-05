@@ -4,7 +4,7 @@ import 'package:flow_builder/flow_builder.dart';
 
 List<Page> onGenerateProfilePages(Profile profile, List<Page> pages) {
   return [
-    MaterialPage<void>(child: ProfileNameForm()),
+    MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
     if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
     if (profile.age != null) MaterialPage<void>(child: ProfileWeightForm()),
   ];
