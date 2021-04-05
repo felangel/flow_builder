@@ -564,6 +564,66 @@ void main() {
       expect(systemPopCallCount, equals(1));
     });
 
+    testWidgets('system back button pops routes that have been pushed',
+        (tester) async {
+      var systemPopCallCount = 0;
+      SystemChannels.platform.setMockMethodCallHandler((call) {
+        if (call.method == 'SystemNavigator.pop') {
+          systemPopCallCount++;
+        }
+        return null;
+      });
+      const buttonKey = Key('__button__');
+      const scaffoldKey = Key('__scaffold__');
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                MaterialPage<void>(
+                  child: Builder(
+                    builder: (context) {
+                      return Scaffold(
+                        body: TextButton(
+                          key: buttonKey,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            Navigator.of(context).push<void>(MaterialPageRoute(
+                              builder: (context) => const Scaffold(
+                                key: scaffoldKey,
+                              ),
+                            ));
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(scaffoldKey), findsOneWidget);
+
+      await TestSystemNavigationObserver.handleSystemNavigation(
+        const MethodCall('popRoute'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(systemPopCallCount, equals(0));
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+    });
+
     testWidgets('Navigator.pop pops parent route', (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
