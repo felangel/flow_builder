@@ -1,3 +1,8 @@
+# 0.0.3
+
+- fix: respect top-level `WillPopScope`
+  - A top-level `WillPopScope` can be added to prevent popping the first page in a flow
+
 # 0.0.2
 
 - fix: don't lose system push events and pass them to WidgetsBindings
