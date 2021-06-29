@@ -1182,6 +1182,118 @@ void main() {
       final navigators = tester.widgetList<Navigator>(find.byType(Navigator));
       expect(navigators.last.observers, equals(observers));
     });
+
+    testWidgets('SystemNavigator.pop respects when WillPopScope returns false',
+        (tester) async {
+      const targetKey = Key('__target__');
+      var onWillPopCallCount = 0;
+      final flow = FlowBuilder<int>(
+        state: 0,
+        onGeneratePages: (state, pages) {
+          return <Page>[
+            MaterialPage<void>(
+              child: Builder(
+                builder: (context) => WillPopScope(
+                  onWillPop: () async {
+                    onWillPopCallCount++;
+                    return false;
+                  },
+                  child: TextButton(
+                    key: targetKey,
+                    onPressed: () {
+                      TestSystemNavigationObserver.handleSystemNavigation(
+                        const MethodCall('popRoute'),
+                      );
+                    },
+                    child: const SizedBox(),
+                  ),
+                ),
+              ),
+            )
+          ];
+        },
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => flow),
+                );
+              },
+              child: const Text('X'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('X'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(targetKey), findsOneWidget);
+      await tester.tap(find.byKey(targetKey));
+      await tester.pumpAndSettle();
+
+      expect(onWillPopCallCount, equals(1));
+      expect(find.byKey(targetKey), findsOneWidget);
+    });
+
+    testWidgets('SystemNavigator.pop respects when WillPopScope returns true',
+        (tester) async {
+      const targetKey = Key('__target__');
+      var onWillPopCallCount = 0;
+      final flow = FlowBuilder<int>(
+        state: 0,
+        onGeneratePages: (state, pages) {
+          return <Page>[
+            MaterialPage<void>(
+              child: Builder(
+                builder: (context) => WillPopScope(
+                  onWillPop: () async {
+                    onWillPopCallCount++;
+                    return true;
+                  },
+                  child: TextButton(
+                    key: targetKey,
+                    onPressed: () {
+                      TestSystemNavigationObserver.handleSystemNavigation(
+                        const MethodCall('popRoute'),
+                      );
+                    },
+                    child: const SizedBox(),
+                  ),
+                ),
+              ),
+            )
+          ];
+        },
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => flow),
+                );
+              },
+              child: const Text('X'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('X'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(targetKey), findsOneWidget);
+      await tester.tap(find.byKey(targetKey));
+      await tester.pumpAndSettle();
+
+      expect(onWillPopCallCount, equals(1));
+      expect(find.byKey(targetKey), findsNothing);
+    });
   });
 }
 

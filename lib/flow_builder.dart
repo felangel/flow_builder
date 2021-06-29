@@ -130,9 +130,10 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   Future<bool> _pop() async {
     if (mounted) {
-      final navigator = _canPop ? _navigator : Navigator.of(context);
-      final willPop = await navigator?.maybePop(_state) ?? false;
-      return willPop;
+      final popHandled = await _navigator?.maybePop(_state) ?? false;
+      if (popHandled) return true;
+      if (!_canPop) return await Navigator.of(context).maybePop(_state);
+      return false;
     }
     return false;
   }
