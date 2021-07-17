@@ -274,6 +274,7 @@ class FlowController<T> implements Listenable {
   }
 
   /// Register a closure to be called when the flow state changes.
+  @mustCallSuper
   @override
   void addListener(VoidCallback listener) {
     _notifier.addListener(listener);
@@ -281,6 +282,7 @@ class FlowController<T> implements Listenable {
 
   /// Remove a previously registered closure from the list of closures that the
   /// object notifies.
+  @mustCallSuper
   @override
   void removeListener(VoidCallback listener) {
     _notifier.removeListener(listener);
