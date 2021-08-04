@@ -75,7 +75,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   final _history = ListQueue<T>();
   var _pages = <Page>[];
   var _didPop = false;
-  final _navigatorKey = GlobalKey<NavigatorState>();
+  late final GlobalObjectKey<NavigatorState> _navigatorKey;
   NavigatorState? get _navigator => _navigatorKey.currentState;
   T get _state => _controller.state;
   bool get _canPop => _pages.length > 1 || (_navigator?.canPop() ?? false);
@@ -83,6 +83,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   @override
   void initState() {
     super.initState();
+    _navigatorKey = GlobalObjectKey<NavigatorState>(this);
     _SystemNavigationObserver.add(_pop);
     _controller = _initController(widget.state);
     _pages = widget.onGeneratePages(_state, List.of(_pages));
@@ -116,9 +117,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   void _removeListeners({required bool dispose}) {
     _controller.removeListener(_listener);
-    if (dispose) {
-      _controller.dispose();
-    }
+    if (dispose) _controller.dispose();
   }
 
   @override
@@ -140,13 +139,10 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   void _listener() {
     if (_controller._completed) {
-      if (widget.onComplete != null) {
-        return widget.onComplete!(_state);
-      }
-      if (mounted) {
-        return Navigator.of(context).pop(_state);
-      }
+      if (widget.onComplete != null) return widget.onComplete!(_state);
+      if (mounted) return Navigator.of(context).pop(_state);
     }
+
     if (_didPop) {
       _didPop = false;
       return;

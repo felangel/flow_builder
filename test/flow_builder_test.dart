@@ -1294,6 +1294,60 @@ void main() {
       expect(onWillPopCallCount, equals(1));
       expect(find.byKey(targetKey), findsNothing);
     });
+
+    testWidgets('updates do not trigger rebuilds of existing pages by value',
+        (tester) async {
+      const buttonKey = Key('__button__');
+      const boxKey = Key('__box__');
+      var numBuildsA = 0;
+      var numBuildsB = 0;
+      final pageA = MaterialPage<void>(
+        child: Builder(
+          builder: (context) {
+            numBuildsA++;
+            return TextButton(
+              key: buttonKey,
+              child: const Text('Button'),
+              onPressed: () => context.flow<int>().update((s) => s + 1),
+            );
+          },
+        ),
+      );
+      final pageB = MaterialPage<void>(
+        child: Builder(
+          builder: (context) {
+            numBuildsB++;
+            return const SizedBox(key: boxKey);
+          },
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            key: const ValueKey('flow'),
+            state: 0,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                pageA,
+                if (state == 1) pageB,
+              ];
+            },
+          ),
+        ),
+      );
+      expect(numBuildsA, 1);
+      expect(numBuildsB, 0);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(boxKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuildsA, 1);
+      expect(numBuildsB, 1);
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(boxKey), findsOneWidget);
+    });
   });
 }
 
