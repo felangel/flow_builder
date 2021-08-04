@@ -138,7 +138,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   }
 
   void _listener() {
-    if (_controller._completed) {
+    if (_controller.completed) {
       if (widget.onComplete != null) return widget.onComplete!(_state);
       if (mounted) return Navigator.of(context).pop(_state);
     }
@@ -172,7 +172,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
-              _controller._notifier.value = _history.last;
+              _controller.state = _history.last;
             }
             if (_pages.length > 1) {
               _pages.removeLast();
@@ -242,7 +242,15 @@ class FlowController<T> implements Listenable {
   /// The current state of the flow.
   T get state => _notifier.value;
 
+  @protected
+  set state(T value) {
+    _notifier.value = value;
+  }
+
   bool _completed = false;
+
+  /// Whether the current flow has been completed.
+  bool get completed => _completed;
 
   /// [update] can be called to update the current flow state.
   /// [update] takes a closure which exposes the current flow state
@@ -310,7 +318,7 @@ class FakeFlowController<T> extends FlowController<T> {
   @override
   T get state => _state;
 
-  /// Whether the flow has been completed.
+  @override
   bool get completed => _completed;
 
   @override
