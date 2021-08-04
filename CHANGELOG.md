@@ -1,3 +1,9 @@
+# 0.0.4
+
+- refactor: decouple `FlowController` from `FlowBuilder`
+- refactor: organize imports and minor updates
+- fix: super call enforcement on listeners
+
 # 0.0.3
 
 - fix: respect top-level `WillPopScope`
