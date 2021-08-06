@@ -273,6 +273,17 @@ class FlowController<T> extends ChangeNotifier {
     final nextState = callback?.call(_state) ?? _state;
     state = nextState;
   }
+
+  /// Register a closure to be called when the flow state changes.
+  @mustCallSuper
+  @override
+  void addListener(VoidCallback listener) => super.addListener(listener);
+
+  /// Remove a previously registered closure from the list of closures that the
+  /// object notifies.
+  @mustCallSuper
+  @override
+  void removeListener(VoidCallback listener) => super.removeListener(listener);
 }
 
 /// {@template fake_flow_controller}
