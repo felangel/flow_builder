@@ -172,7 +172,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
-              _controller.state = _history.last;
+              _controller.update((_) => _history.last);
             }
             if (_pages.length > 1) {
               _pages.removeLast();
@@ -242,12 +242,6 @@ class FlowController<T> extends ChangeNotifier {
   /// The current state of the flow.
   T get state => _state;
 
-  @protected
-  set state(T value) {
-    _state = value;
-    notifyListeners();
-  }
-
   bool _completed = false;
 
   /// Whether the current flow has been completed.
@@ -260,7 +254,8 @@ class FlowController<T> extends ChangeNotifier {
   /// When [update] is called, the `builder` method of the corresponding
   /// [FlowBuilder] will be called with the new flow state.
   void update(T Function(T) callback) {
-    state = callback(_state);
+    _state = callback(_state);
+    notifyListeners();
   }
 
   /// [complete] can be called to complete the current flow.
@@ -271,7 +266,8 @@ class FlowController<T> extends ChangeNotifier {
   void complete([T Function(T)? callback]) {
     _completed = true;
     final nextState = callback?.call(_state) ?? _state;
-    state = nextState;
+    _state = nextState;
+    notifyListeners();
   }
 
   /// Register a closure to be called when the flow state changes.
