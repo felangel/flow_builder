@@ -9,6 +9,13 @@ import 'package:flutter/widgets.dart';
 /// and the current [List<Page>].
 typedef OnGeneratePages<T> = List<Page> Function(T, List<Page>);
 
+/// Signature for function which given an input flow state [T] will
+/// output a new flow state [T].
+///
+/// It is used to compute the next flow state with [FlowController.update] and
+/// [FlowController.complete].
+typedef FlowCallback<T> = T Function(T state);
+
 /// {@template flow_builder}
 /// [FlowBuilder] abstracts navigation and exposes a declarative routing API
 /// based on a [state].
@@ -258,7 +265,7 @@ class FlowController<T> implements Listenable {
   ///
   /// When [update] is called, the `builder` method of the corresponding
   /// [FlowBuilder] will be called with the new flow state.
-  void update(T Function(T) callback) {
+  void update(FlowCallback<T> callback) {
     _notifier.value = callback(_notifier.value);
   }
 
@@ -267,7 +274,7 @@ class FlowController<T> implements Listenable {
   /// and is responsible for returning the new flow state.
   ///
   /// When [complete] is called, the flow is popped with the new flow state.
-  void complete([T Function(T)? callback]) {
+  void complete([FlowCallback<T>? callback]) {
     _completed = true;
     final state = callback?.call(_notifier.value) ?? _notifier.value;
     if (state == _notifier.value) {
@@ -322,12 +329,12 @@ class FakeFlowController<T> extends FlowController<T> {
   bool get completed => _completed;
 
   @override
-  void update(T Function(T) callback) {
+  void update(FlowCallback<T> callback) {
     _state = callback(_state);
   }
 
   @override
-  void complete([T Function(T)? callback]) {
+  void complete([FlowCallback<T>? callback]) {
     _completed = true;
     if (callback != null) {
       _state = callback(_state);
