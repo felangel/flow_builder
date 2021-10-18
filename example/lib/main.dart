@@ -42,10 +42,7 @@ class UrlFlowBuilder extends StatelessWidget {
           if (uri.pathSegments.first == 'auth') AuthenticationFlow.page(),
         ];
       },
-      onLocationChanged: (location, state) {
-        print('onLocationChanged($location, $state)');
-        return location;
-      },
+      onLocationChanged: (location, state) => location,
       onDidPop: (dynamic result) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()

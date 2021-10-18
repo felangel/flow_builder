@@ -149,7 +149,6 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   @override
   void dispose() {
-    print('dispose');
     _SystemNavigationObserver.removePopInterceptor(_pop);
     _SystemNavigationObserver.removePushInterceptor(_push);
     _removeListeners(dispose: widget.controller == null);
@@ -167,7 +166,6 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   }
 
   Future<void> _push(Uri location) async {
-    print('_push $location');
     if (!mounted) return;
     final onLocationChanged = widget.onLocationChanged;
     if (onLocationChanged == null) return;
@@ -206,8 +204,6 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
           pages: _pages,
           observers: [_FlowNavigatorObserver(), ...widget.observers],
           onPopPage: (route, dynamic result) {
-            print('onPopPage');
-            print(_SystemNavigationObserver._location);
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
