@@ -5,6 +5,10 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+typedef OnLocationChanged<T> = T Function(Uri location, T state);
+
+typedef OnDidPop<T> = void Function(T result);
+
 /// Signature for function which generates a [List<Page>] given an input of [T]
 /// and the current [List<Page>].
 typedef OnGeneratePages<T> = List<Page<dynamic>> Function(
@@ -44,6 +48,8 @@ class FlowBuilder<T> extends StatefulWidget {
   const FlowBuilder({
     super.key,
     required this.onGeneratePages,
+    this.onLocationChanged,
+    this.onDidPop,
     this.state,
     this.onComplete,
     this.controller,
@@ -59,6 +65,10 @@ class FlowBuilder<T> extends StatefulWidget {
 
   /// Builds a [List<Page>] based on the current state.
   final OnGeneratePages<T> onGeneratePages;
+
+  final OnLocationChanged<T>? onLocationChanged;
+
+  final OnDidPop<dynamic>? onDidPop;
 
   /// Optional [ValueSetter<T>] which is invoked when the
   /// flow has been completed with the final flow state.
@@ -86,6 +96,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   var _didPop = false;
   late final GlobalObjectKey<NavigatorState> _navigatorKey;
   NavigatorState? get _navigator => _navigatorKey.currentState;
+  Uri get _location => _SystemNavigationObserver._location;
   T get _state => _controller.state;
   bool get _canPop => _pages.length > 1 || (_navigator?.canPop() ?? false);
 
@@ -93,8 +104,17 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   void initState() {
     super.initState();
     _navigatorKey = GlobalObjectKey<NavigatorState>(this);
-    _SystemNavigationObserver.add(_pop);
-    _controller = _initController(widget.state);
+    _SystemNavigationObserver.addPopInterceptor(_pop);
+    if (widget.onLocationChanged != null) {
+      final state = widget.onLocationChanged!(
+        _location,
+        widget.state ?? widget.controller!.state,
+      );
+      _controller = _initController(state);
+      _SystemNavigationObserver.addPushInterceptor(_push);
+    } else {
+      _controller = _initController(widget.state);
+    }
     _pages = widget.onGeneratePages(_state, List.of(_pages));
     _history.add(_state);
   }
@@ -132,7 +152,8 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   @override
   void dispose() {
-    _SystemNavigationObserver.remove(_pop);
+    _SystemNavigationObserver.removePopInterceptor(_pop);
+    _SystemNavigationObserver.removePushInterceptor(_push);
     _removeListeners(dispose: widget.controller == null);
     super.dispose();
   }
@@ -145,6 +166,13 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       return false;
     }
     return false;
+  }
+
+  Future<void> _push(Uri location) async {
+    if (!mounted) return;
+    final onLocationChanged = widget.onLocationChanged;
+    if (onLocationChanged == null) return;
+    _controller.update((state) => onLocationChanged(location, state));
   }
 
   void _listener() {
@@ -178,15 +206,22 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
         child: Navigator(
           key: _navigatorKey,
           pages: _pages,
-          observers: widget.observers,
+          observers: [_FlowNavigatorObserver(), ...widget.observers],
           onPopPage: (route, dynamic result) {
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
+              widget.onDidPop?.call(result);
               _controller.update((_) => _history.last);
             }
-            if (_pages.length > 1) {
-              _pages.removeLast();
+            if (_pages.length > 1) _pages.removeLast();
+            final onLocationChanged = widget.onLocationChanged;
+            final pageLocation = _pages.last.name;
+            if (onLocationChanged != null && pageLocation != null) {
+              _SystemNavigationObserver._updateLocation(pageLocation);
+              _controller.update(
+                (state) => onLocationChanged(Uri.parse(pageLocation), state),
+              );
             }
             setState(() {});
             return route.didPop(result);
@@ -338,16 +373,57 @@ class _ConditionalWillPopScope extends StatelessWidget {
   }
 }
 
-abstract class _SystemNavigationObserver implements WidgetsBinding {
-  static final _interceptors = ListQueue<ValueGetter<Future<bool>>>();
+class _FlowNavigatorObserver extends NavigatorObserver {
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    super.didPush(route, previousRoute);
+    if (route.settings.name != null) {
+      _SystemNavigationObserver._updateLocation(route.settings.name);
+    }
+  }
 
-  static void add(ValueGetter<Future<bool>> interceptor) {
-    _interceptors.addFirst(interceptor);
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    super.didPop(route, previousRoute);
+    if (previousRoute?.settings.name != null) {
+      _SystemNavigationObserver._updateLocation(previousRoute?.settings.name);
+    }
+  }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    if (newRoute?.settings.name != null) {
+      _SystemNavigationObserver._updateLocation(newRoute?.settings.name);
+    }
+  }
+}
+
+abstract class _SystemNavigationObserver implements WidgetsBinding {
+  static final _popInterceptors = ListQueue<ValueGetter<Future<bool>>>();
+  static final _pushInterceptors = ListQueue<Future<void> Function(Uri)>();
+
+  static Uri _location = _rootLocation;
+
+  static void _updateLocation(String? path) =>
+      _location = path != null ? Uri.parse(path) : _rootLocation;
+
+  static void addPopInterceptor(ValueGetter<Future<bool>> interceptor) {
+    _popInterceptors.addFirst(interceptor);
     SystemChannels.navigation.setMethodCallHandler(_handleSystemNavigation);
   }
 
-  static void remove(ValueGetter<Future<bool>> interceptor) {
-    _interceptors.remove(interceptor);
+  static void addPushInterceptor(Future<void> Function(Uri) interceptor) {
+    _pushInterceptors.addLast(interceptor);
+    SystemChannels.navigation.setMethodCallHandler(_handleSystemNavigation);
+  }
+
+  static void removePopInterceptor(ValueGetter<Future<bool>> interceptor) {
+    _popInterceptors.remove(interceptor);
+  }
+
+  static void removePushInterceptor(Future<void> Function(Uri) interceptor) {
+    _pushInterceptors.remove(interceptor);
   }
 
   static Future<dynamic> _handleSystemNavigation(MethodCall methodCall) {
@@ -361,8 +437,8 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 
-  static Future<dynamic> _popRoute() async {
-    for (final interceptor in _interceptors) {
+  static Future _popRoute() async {
+    for (final interceptor in _popInterceptors) {
       final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
     }
@@ -371,7 +447,14 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
 
   static Future<dynamic> _pushRoute(dynamic arguments) async {
     if (arguments is String) {
-      return WidgetsBinding.instance.handlePushRoute(arguments);
+      arguments = arguments.isEmpty ? _rootPath : arguments;
+      final uri = Uri.parse(arguments);
+      if (_location == uri) return;
+      _location = uri;
+      if (_pushInterceptors.isEmpty) {
+        return WidgetsBinding.instance!.handlePushRoute(arguments);
+      }
+      for (final interceptor in _pushInterceptors) await interceptor(uri);
     } else {
       return Future<dynamic>.value();
     }
@@ -386,3 +469,6 @@ abstract class TestSystemNavigationObserver {
     return _SystemNavigationObserver._handleSystemNavigation(methodCall);
   }
 }
+
+const _rootPath = '/';
+final _rootLocation = Uri(path: _rootPath);

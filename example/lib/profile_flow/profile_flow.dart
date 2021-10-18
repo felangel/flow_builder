@@ -2,30 +2,44 @@ import 'package:equatable/equatable.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
-List<Page<dynamic>> onGenerateProfilePages(
-  Profile profile,
-  List<Page<dynamic>> pages,
-) {
-  return [
-    const MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
-    if (profile.name != null) const MaterialPage<void>(child: ProfileAgeForm()),
-    if (profile.age != null)
-      const MaterialPage<void>(child: ProfileWeightForm()),
-  ];
-}
-
 class ProfileFlow extends StatelessWidget {
   const ProfileFlow._();
 
+  static Page<Profile> page() => const MaterialPage(child: ProfileFlow._());
+
   static Route<Profile> route() {
-    return MaterialPageRoute(builder: (_) => const ProfileFlow._());
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/profile'),
+      builder: (_) => const ProfileFlow._(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const FlowBuilder<Profile>(
-      state: Profile(),
-      onGeneratePages: onGenerateProfilePages,
+    return FlowBuilder<Profile>(
+      state: const Profile(),
+      onGeneratePages: (Profile profile, List<Page<dynamic>> pages) {
+        return [
+          const MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
+          if (profile.name != null)
+            MaterialPage<void>(
+              child: const ProfileAgeForm(),
+              name: '/profile?name=${profile.name}',
+            ),
+          if (profile.age != null)
+            MaterialPage<void>(
+              child: const ProfileWeightForm(),
+              name: '/profile?name=${profile.name}&age=${profile.age}',
+            ),
+        ];
+      },
+      onLocationChanged: (location, state) {
+        return Profile(
+          name: location.queryParameters['name'],
+          weight: int.tryParse(location.queryParameters['weight'] ?? ''),
+          age: int.tryParse(location.queryParameters['age'] ?? ''),
+        );
+      },
     );
   }
 }
