@@ -12,6 +12,7 @@ enum OnboardingState {
 
 List<Page> onGenerateOnboardingPages(OnboardingState state, List<Page> pages) {
   switch (state) {
+    case OnboardingState.onboardingComplete:
     case OnboardingState.usageComplete:
       return [
         OnboardingWelcome.page(),
@@ -30,16 +31,31 @@ List<Page> onGenerateOnboardingPages(OnboardingState state, List<Page> pages) {
 }
 
 class OnboardingFlow extends StatelessWidget {
+  const OnboardingFlow({Key? key}) : super(key: key);
+
+  static Page<OnboardingState> page() {
+    return const MaterialPage(child: OnboardingFlow());
+  }
+
   static Route<OnboardingState> route() {
-    return MaterialPageRoute(builder: (_) => OnboardingFlow());
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/onboarding/0'),
+      builder: (_) => const OnboardingFlow(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder(
+    return FlowBuilder<OnboardingState>(
       state: OnboardingState.initial,
       observers: [HeroController()],
       onGeneratePages: onGenerateOnboardingPages,
+      onLocationChanged: (location, state) {
+        final index = location.pathSegments.length > 1
+            ? int.tryParse(location.pathSegments[1]) ?? 0
+            : 0;
+        return OnboardingState.values[index];
+      },
     );
   }
 }

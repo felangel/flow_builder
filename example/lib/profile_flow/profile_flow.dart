@@ -2,24 +2,42 @@ import 'package:equatable/equatable.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
-List<Page> onGenerateProfilePages(Profile profile, List<Page> pages) {
-  return [
-    MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
-    if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
-    if (profile.age != null) MaterialPage<void>(child: ProfileWeightForm()),
-  ];
-}
-
 class ProfileFlow extends StatelessWidget {
+  static Page<Profile> page() => MaterialPage(child: ProfileFlow());
+
   static Route<Profile> route() {
-    return MaterialPageRoute(builder: (_) => ProfileFlow());
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/profile'),
+      builder: (_) => ProfileFlow(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const FlowBuilder<Profile>(
-      state: Profile(),
-      onGeneratePages: onGenerateProfilePages,
+    return FlowBuilder<Profile>(
+      state: const Profile(),
+      onGeneratePages: (Profile profile, List<Page> pages) {
+        return [
+          MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
+          if (profile.name != null)
+            MaterialPage<void>(
+              child: ProfileAgeForm(),
+              name: '/profile?name=${profile.name}',
+            ),
+          if (profile.age != null)
+            MaterialPage<void>(
+              child: ProfileWeightForm(),
+              name: '/profile?name=${profile.name}&age=${profile.age}',
+            ),
+        ];
+      },
+      onLocationChanged: (location, state) {
+        return Profile(
+          name: location.queryParameters['name'],
+          weight: int.tryParse(location.queryParameters['weight'] ?? ''),
+          age: int.tryParse(location.queryParameters['age'] ?? ''),
+        );
+      },
     );
   }
 }

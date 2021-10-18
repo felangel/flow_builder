@@ -17,11 +17,24 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 }
 
 class AuthenticationFlow extends StatelessWidget {
+  const AuthenticationFlow({Key? key}) : super(key: key);
+
   static Route<AuthenticationState> route() {
     return MaterialPageRoute(
+      settings: const RouteSettings(name: '/auth'),
       builder: (_) => BlocProvider(
         create: (_) => AuthenticationCubit(),
-        child: AuthenticationFlow(),
+        child: const AuthenticationFlow(),
+      ),
+    );
+  }
+
+  static Page<AuthenticationState> page() {
+    return MaterialPage(
+      name: '/auth',
+      child: BlocProvider(
+        create: (_) => AuthenticationCubit(),
+        child: const AuthenticationFlow(),
       ),
     );
   }
