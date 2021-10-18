@@ -21,15 +21,29 @@ List<Page> onGenerateLocationPages(Location location, List<Page> pages) {
 }
 
 class LocationFlow extends StatelessWidget {
+  const LocationFlow({Key? key}) : super(key: key);
+
+  static Page<Location> page() => const MaterialPage(child: LocationFlow());
+
   static Route<Location> route() {
-    return MaterialPageRoute(builder: (_) => LocationFlow());
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/location'),
+      builder: (_) => const LocationFlow(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const FlowBuilder<Location>(
-      state: Location(),
+    return FlowBuilder<Location>(
+      state: const Location(),
       onGeneratePages: onGenerateLocationPages,
+      onLocationChanged: (location, state) {
+        return Location(
+          country: location.queryParameters['country'],
+          city: location.queryParameters['city'],
+          state: location.queryParameters['state'],
+        );
+      },
     );
   }
 }
