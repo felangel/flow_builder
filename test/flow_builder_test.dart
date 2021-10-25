@@ -1180,7 +1180,8 @@ void main() {
       );
 
       final navigators = tester.widgetList<Navigator>(find.byType(Navigator));
-      expect(navigators.last.observers, equals(observers));
+      navigators.last.observers.removeWhere((o) => o is FlowNavigatorObserver);
+      expect(observers, equals(observers));
     });
 
     testWidgets('SystemNavigator.pop respects when WillPopScope returns false',
