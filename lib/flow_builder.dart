@@ -454,7 +454,7 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
       if (_pushInterceptors.isEmpty) {
         return WidgetsBinding.instance!.handlePushRoute(arguments);
       }
-      for (final interceptor in _pushInterceptors) await interceptor(uri);
+      await _pushInterceptors.first.call(uri);
     } else {
       return Future<dynamic>.value();
     }
