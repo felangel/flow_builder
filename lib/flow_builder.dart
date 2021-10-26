@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Signature for function which given a location [Uri] and
-/// a state [T] will call an action to handle the change.
+/// a state [T] is responsible for returning a new state [T].
 typedef OnLocationChanged<T> = T Function(Uri location, T state);
 
 /// Signature for function which given a result [T] will
