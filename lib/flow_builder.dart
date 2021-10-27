@@ -209,7 +209,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
         child: Navigator(
           key: _navigatorKey,
           pages: _pages,
-          observers: [FlowNavigatorObserver(), ...widget.observers],
+          observers: [_FlowNavigatorObserver(), ...widget.observers],
           onPopPage: (route, dynamic result) {
             if (_history.length > 1) {
               _history.removeLast();
@@ -404,8 +404,7 @@ class _ConditionalWillPopScope extends StatelessWidget {
 }
 
 /// Default [NavigatorObserver] for every [FlowBuilder].
-@visibleForTesting
-class FlowNavigatorObserver extends NavigatorObserver {
+class _FlowNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route route, Route? previousRoute) {
     super.didPush(route, previousRoute);
