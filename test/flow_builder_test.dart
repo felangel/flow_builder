@@ -40,6 +40,23 @@ void main() {
     });
 
     testWidgets(
+        'initializes controller when onLocationChanged callback is provided',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<dynamic>(
+            state: 0,
+            onGeneratePages: (dynamic state, pages) {
+              return const <Page>[MaterialPage<void>(child: SizedBox())];
+            },
+            onLocationChanged: (Uri _, dynamic __) => '',
+          ),
+        ),
+      );
+      expect(find.byType(FlowBuilder), findsOneWidget);
+    });
+
+    testWidgets(
         'throws FlutterError when context.flow is called '
         'outside of FlowBuilder', (tester) async {
       await tester.pumpWidget(
@@ -1180,7 +1197,7 @@ void main() {
       );
 
       final navigators = tester.widgetList<Navigator>(find.byType(Navigator));
-      expect(navigators.last.observers, equals(observers));
+      expect(navigators.last.observers, containsAll(observers));
     });
 
     testWidgets('SystemNavigator.pop respects when WillPopScope returns false',

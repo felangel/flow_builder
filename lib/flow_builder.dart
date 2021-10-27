@@ -5,8 +5,12 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+/// Signature for function which given a location [Uri] and
+/// a state [T] is responsible for returning a new state [T].
 typedef OnLocationChanged<T> = T Function(Uri location, T state);
 
+/// Signature for function which given a result [T] will
+/// call an action to handle the current [Route] pop.
 typedef OnDidPop<T> = void Function(T result);
 
 /// Signature for function which generates a [List<Page>] given an input of [T]
@@ -64,8 +68,10 @@ class FlowBuilder<T> extends StatefulWidget {
   /// Builds a [List<Page>] based on the current state.
   final OnGeneratePages<T> onGeneratePages;
 
+  /// Optional callback which handles [Uri] changes.
   final OnLocationChanged<T>? onLocationChanged;
 
+  /// Optional callback which is called when the current [Route] pops.
   final OnDidPop<dynamic>? onDidPop;
 
   /// Optional [ValueSetter<T>] which is invoked when the
@@ -169,6 +175,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     if (!mounted) return;
     final onLocationChanged = widget.onLocationChanged;
     if (onLocationChanged == null) return;
+
     _controller.state = onLocationChanged(location, _state);
   }
 
@@ -396,6 +403,7 @@ class _ConditionalWillPopScope extends StatelessWidget {
   }
 }
 
+/// Default [NavigatorObserver] for every [FlowBuilder].
 class _FlowNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route route, Route? previousRoute) {
