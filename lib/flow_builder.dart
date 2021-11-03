@@ -179,7 +179,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
-              _controller.state = _history.last;
+              _controller.update((_) => _history.last);
             }
             if (_pages.length > 1) {
               _pages.removeLast();
@@ -238,21 +238,16 @@ extension FlowX on BuildContext {
 /// A controller which exposes APIs to [update] and [complete]
 /// the current flow.
 /// {@endtemplate}
-class FlowController<T> implements Listenable {
+class FlowController<T> extends ChangeNotifier {
   /// {@macro flow_controller}
-  FlowController(T state) : this._(ValueNotifier<T>(state));
+  FlowController(T state) : this._(state);
 
-  FlowController._(this._notifier);
+  FlowController._(this._state);
 
-  final ValueNotifier<T> _notifier;
+  T _state;
 
   /// The current state of the flow.
-  T get state => _notifier.value;
-
-  @protected
-  set state(T value) {
-    _notifier.value = value;
-  }
+  T get state => _state;
 
   bool _completed = false;
 
@@ -266,7 +261,8 @@ class FlowController<T> implements Listenable {
   /// When [update] is called, the `builder` method of the corresponding
   /// [FlowBuilder] will be called with the new flow state.
   void update(FlowCallback<T> callback) {
-    _notifier.value = callback(_notifier.value);
+    _state = callback(_state);
+    notifyListeners();
   }
 
   /// [complete] can be called to complete the current flow.
@@ -276,36 +272,21 @@ class FlowController<T> implements Listenable {
   /// When [complete] is called, the flow is popped with the new flow state.
   void complete([FlowCallback<T>? callback]) {
     _completed = true;
-    final state = callback?.call(_notifier.value) ?? _notifier.value;
-    if (state == _notifier.value) {
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-      _notifier.notifyListeners();
-    }
-    _notifier.value = state;
+    final nextState = callback?.call(_state) ?? _state;
+    _state = nextState;
+    notifyListeners();
   }
 
   /// Register a closure to be called when the flow state changes.
   @mustCallSuper
   @override
-  void addListener(VoidCallback listener) {
-    _notifier.addListener(listener);
-  }
+  void addListener(VoidCallback listener) => super.addListener(listener);
 
   /// Remove a previously registered closure from the list of closures that the
   /// object notifies.
   @mustCallSuper
   @override
-  void removeListener(VoidCallback listener) {
-    _notifier.removeListener(listener);
-  }
-
-  /// Discards any resources used by the object. After this is called, the
-  /// object is not in a usable state and should be discarded (calls to
-  /// [addListener] and [removeListener] will throw after the object is
-  /// disposed).
-  ///
-  /// This method should only be called by the object's owner.
-  void dispose() => _notifier.dispose();
+  void removeListener(VoidCallback listener) => super.removeListener(listener);
 }
 
 /// {@template fake_flow_controller}
@@ -316,11 +297,7 @@ class FlowController<T> implements Listenable {
 /// {@endtemplate}
 class FakeFlowController<T> extends FlowController<T> {
   /// {@macro fake_flow_controller}
-  FakeFlowController(T state)
-      : _state = state,
-        super(state);
-
-  T _state;
+  FakeFlowController(T state) : super(state);
 
   @override
   T get state => _state;
@@ -336,9 +313,7 @@ class FakeFlowController<T> extends FlowController<T> {
   @override
   void complete([FlowCallback<T>? callback]) {
     _completed = true;
-    if (callback != null) {
-      _state = callback(_state);
-    }
+    if (callback != null) _state = callback(_state);
   }
 }
 
