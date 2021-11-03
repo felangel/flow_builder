@@ -1,6 +1,6 @@
 # 0.0.5
 
-- fix: fix Intellisense on update doesn't autocomplete state argument [#64](https://github.com/felangel/flow_builder/issues/64)
+- fix: Intellisense on update to include state argument [#64](https://github.com/felangel/flow_builder/issues/64)
 - Introduce FlowCallback typedef to improve readability and reusability
 - Thanks [@narcodico](https://github.com/narcodico) for the contribution
 
