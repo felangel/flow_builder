@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 
 /// Signature for function which generates a [List<Page>] given an input of [T]
 /// and the current [List<Page>].
-typedef OnGeneratePages<T> = List<Page> Function(T, List<Page>);
+typedef OnGeneratePages<T> = List<Page> Function(T state, List<Page> pages);
 
 /// Signature for function which given an input flow state [T] will
 /// output a new flow state [T].
