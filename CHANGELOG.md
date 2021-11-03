@@ -1,8 +1,12 @@
 # 0.0.5
 
-- fix: intellisense on update to include state argument [#64](https://github.com/felangel/flow_builder/issues/64)
-- Introduce FlowCallback typedef to improve readability and reusability
-- Thanks [@narcodico](https://github.com/narcodico) for the contribution
+- **BREAKING**: refactor: `FlowController.state` setter removed in favor of `update` ([#61](https://github.com/felangel/flow_builder/issues/61))
+- fix: `FlowController` notification updates to improve back/forth navigation via `BackButton` ([#61](https://github.com/felangel/flow_builder/issues/61))
+- fix: intellisense on `update` to include state argument ([#64](https://github.com/felangel/flow_builder/issues/64))
+  - introduce FlowCallback typedef to improve readability and reusability
+  - Thanks [@narcodico](https://github.com/narcodico) for the contribution
+- fix: intellisense on `OnGeneratePages` ([#72](https://github.com/felangel/flow_builder/issues/72))
+  - Thanks [@Lootwig](https://github.com/Lootwig) for the contribution
 
 # 0.0.4
 
