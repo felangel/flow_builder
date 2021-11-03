@@ -1,3 +1,9 @@
+# 0.0.5
+
+- fix: intellisense on update to include state argument [#64](https://github.com/felangel/flow_builder/issues/64)
+- Introduce FlowCallback typedef to improve readability and reusability
+- Thanks [@narcodico](https://github.com/narcodico) for the contribution
+
 # 0.0.4
 
 - refactor: decouple `FlowController` from `FlowBuilder`
