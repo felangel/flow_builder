@@ -146,6 +146,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
   void _listener() {
     if (_controller.completed) {
+      _controller.removeListener(_listener);
       if (widget.onComplete != null) return widget.onComplete!(_state);
       if (mounted) return Navigator.of(context).pop(_state);
     }
