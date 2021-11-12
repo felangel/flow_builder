@@ -1,3 +1,7 @@
+# 0.0.6
+
+- fix: removeListener when FlowController has been completed ([#73](https://github.com/felangel/flow_builder/issues/73))
+
 # 0.0.5
 
 - **BREAKING**: refactor: `FlowController.state` setter removed in favor of `update` ([#61](https://github.com/felangel/flow_builder/issues/61))
