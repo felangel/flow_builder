@@ -770,6 +770,46 @@ void main() {
       expect(find.byKey(scaffoldKey), findsOneWidget);
     });
 
+    testWidgets('onComplete callback is only called once', (tester) async {
+      const pageKey = Key('__page__');
+      final controller = FlowController(0);
+      var onCompleteCalls = <int>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            controller: controller,
+            onComplete: onCompleteCalls.add,
+            onGeneratePages: (state, pages) {
+              return <Page>[
+                MaterialPage<void>(
+                  child: Scaffold(
+                    appBar: AppBar(),
+                    body: const SizedBox(key: pageKey),
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+      );
+
+      expect(find.byKey(pageKey), findsOneWidget);
+
+      controller.complete();
+
+      await tester.pumpAndSettle();
+
+      expect(onCompleteCalls, equals([0]));
+      expect(find.byKey(pageKey), findsOneWidget);
+
+      controller.update((state) => state + 1);
+
+      await tester.pumpAndSettle();
+
+      expect(onCompleteCalls, equals([0]));
+      expect(find.byKey(pageKey), findsOneWidget);
+    });
+
     group('pushRoute', () {
       testWidgets(
           'system pushRoute is passed to WidgetsBinding if contains arguments',
