@@ -2,7 +2,6 @@ import 'package:example/authentication_flow/authentication_flow.dart';
 import 'package:example/location_flow/location_flow.dart';
 import 'package:example/onboarding_flow/onboarding_flow.dart';
 import 'package:example/profile_flow/profile_flow.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
