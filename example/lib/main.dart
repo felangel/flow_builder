@@ -5,6 +5,9 @@ import 'package:example/profile_flow/profile_flow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'navigation_cubit.dart';
+import 'router_delegate.dart';
+
 void main() => runApp(MyApp(locationRepository: LocationRepository()));
 
 class MyApp extends StatelessWidget {
@@ -16,14 +19,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: _locationRepository,
-      child: MaterialApp(home: Home()),
+    return BlocProvider(
+      create: (context) => NavigationCubit(),
+      child: RepositoryProvider.value(
+        value: _locationRepository,
+        child: MaterialApp.router(
+          routerDelegate: AppRouterDelegate(),
+          routeInformationParser: AppRouteInformationParser(),
+        ),
+      ),
     );
   }
 }
 
 class Home extends StatelessWidget {
+  static Page page() => MaterialPage<void>(child: Home());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
