@@ -364,12 +364,12 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
       final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
     }
-    return WidgetsBinding.instance!.handlePopRoute();
+    return WidgetsBinding.instance.handlePopRoute();
   }
 
   static Future _pushRoute(dynamic arguments) async {
     if (arguments is String) {
-      return WidgetsBinding.instance!.handlePushRoute(arguments);
+      return WidgetsBinding.instance.handlePushRoute(arguments);
     } else {
       return Future<dynamic>.value();
     }
