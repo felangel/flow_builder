@@ -8,9 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 void main() => runApp(MyApp(locationRepository: LocationRepository()));
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key, required LocationRepository locationRepository})
-      : _locationRepository = locationRepository,
-        super(key: key);
+  MyApp({super.key, required LocationRepository locationRepository})
+      : _locationRepository = locationRepository;
 
   final LocationRepository _locationRepository;
 

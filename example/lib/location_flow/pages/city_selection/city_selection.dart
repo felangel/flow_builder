@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'city_selection_cubit.dart';
 
 class CitySelection extends StatelessWidget {
-  const CitySelection({Key? key, required this.state}) : super(key: key);
+  const CitySelection({super.key, required this.state});
 
   static MaterialPage<void> page({required String state}) {
     return MaterialPage<void>(child: CitySelection(state: state));
