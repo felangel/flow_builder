@@ -1,3 +1,7 @@
+# 0.0.8
+
+- fix: add dart sdk constraint >=2.17.0
+
 # 0.0.7
 
 - refactor: remove null-aware operand
