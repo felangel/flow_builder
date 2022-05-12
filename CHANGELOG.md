@@ -1,3 +1,8 @@
+# 0.0.7
+
+- refactor: remove null-aware operand
+- chore(example): upgrade platforms
+
 # 0.0.6
 
 - fix: removeListener when FlowController has been completed ([#73](https://github.com/felangel/flow_builder/issues/73))

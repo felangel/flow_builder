@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'state_selection_cubit.dart';
 
 class StateSelection extends StatelessWidget {
-  const StateSelection({Key? key, required this.country}) : super(key: key);
+  const StateSelection({super.key, required this.country});
 
   static MaterialPage<void> page({required String country}) {
     return MaterialPage<void>(child: StateSelection(country: country));

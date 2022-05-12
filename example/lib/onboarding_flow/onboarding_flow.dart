@@ -243,7 +243,7 @@ class OnboardingComplete extends StatelessWidget {
 }
 
 class MyPage<T> extends Page<T> {
-  const MyPage({required this.child, LocalKey? key}) : super(key: key);
+  const MyPage({required this.child, super.key});
 
   final Widget child;
 
