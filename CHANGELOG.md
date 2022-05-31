@@ -1,3 +1,7 @@
+# 0.0.9
+
+- fix: cannot pop with Android back button
+
 # 0.0.8
 
 - fix: add dart sdk constraint >=2.17.0
