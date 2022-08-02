@@ -11,26 +11,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: subosito/flutter-action@v2
-
-      - name: Install Dependencies
-        run: flutter packages get
-
-      - name: Format
-        run: flutter format --set-exit-if-changed lib example
-
-      - name: Analyze
-        run: flutter analyze lib example
-
-      - name: Run tests
-        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
-
-      - name: Check Code Coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v1
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
+    with:
+      flutter_channel: stable
+      flutter_version: 3.0.5
 
   pana:
     runs-on: ubuntu-latest
