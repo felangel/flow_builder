@@ -412,8 +412,9 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
 
   static Uri _location = _rootLocation;
 
-  static void _updateLocation(String? path) =>
-      _location = path != null ? Uri.parse(path) : _rootLocation;
+  static void _updateLocation(String? path) {
+    _location = path != null ? Uri.parse(path) : _rootLocation;
+  }
 
   static void addPopInterceptor(ValueGetter<Future<bool>> interceptor) {
     _popInterceptors.addFirst(interceptor);
@@ -466,14 +467,29 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
       return Future<dynamic>.value();
     }
   }
+
+  static Future _handlePlatformMessage(MethodCall methodCall) {
+    return ServicesBinding.instance!.defaultBinaryMessenger
+        .handlePlatformMessage(
+      'flutter/navigation',
+      const JSONMethodCodec().encodeMethodCall(methodCall),
+      (_) {},
+    );
+  }
 }
 
 /// Visible for testing system navigation.
 abstract class TestSystemNavigationObserver {
-  /// Visible for testing system pop navigation.
+  /// Visible for testing system push/pop navigation.
   @visibleForTesting
   static Future<dynamic> handleSystemNavigation(MethodCall methodCall) {
     return _SystemNavigationObserver._handleSystemNavigation(methodCall);
+  }
+
+  /// Visible for testing system platform message navigation.
+  @visibleForTesting
+  static Future<dynamic> handlePlatformMessage(MethodCall methodCall) {
+    return _SystemNavigationObserver._handlePlatformMessage(methodCall);
   }
 }
 
