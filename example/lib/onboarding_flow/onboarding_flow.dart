@@ -10,7 +10,10 @@ enum OnboardingState {
   onboardingComplete,
 }
 
-List<Page> onGenerateOnboardingPages(OnboardingState state, List<Page> pages) {
+List<Page<dynamic>> onGenerateOnboardingPages(
+  OnboardingState state,
+  List<Page<dynamic>> pages,
+) {
   switch (state) {
     case OnboardingState.usageComplete:
       return [
@@ -24,14 +27,16 @@ List<Page> onGenerateOnboardingPages(OnboardingState state, List<Page> pages) {
         OnboardingUsage.page(),
       ];
     case OnboardingState.initial:
-    default:
+    case OnboardingState.onboardingComplete:
       return [OnboardingWelcome.page()];
   }
 }
 
 class OnboardingFlow extends StatelessWidget {
+  const OnboardingFlow._();
+
   static Route<OnboardingState> route() {
-    return MaterialPageRoute(builder: (_) => OnboardingFlow());
+    return MaterialPageRoute(builder: (_) => const OnboardingFlow._());
   }
 
   @override
@@ -45,7 +50,9 @@ class OnboardingFlow extends StatelessWidget {
 }
 
 class OnboardingWelcome extends StatelessWidget {
-  static Page page() => MyPage<void>(child: OnboardingWelcome());
+  const OnboardingWelcome._();
+
+  static Page<void> page() => const MyPage<void>(child: OnboardingWelcome._());
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +119,9 @@ class OnboardingWelcome extends StatelessWidget {
 }
 
 class OnboardingUsage extends StatelessWidget {
-  static Page page() => MyPage<void>(child: OnboardingUsage());
+  const OnboardingUsage._();
+
+  static Page<void> page() => const MyPage<void>(child: OnboardingUsage._());
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +187,9 @@ class OnboardingUsage extends StatelessWidget {
 }
 
 class OnboardingComplete extends StatelessWidget {
-  static Page page() => MyPage<void>(child: OnboardingComplete());
+  const OnboardingComplete._();
+
+  static Page<void> page() => const MyPage<void>(child: OnboardingComplete._());
 
   @override
   Widget build(BuildContext context) {

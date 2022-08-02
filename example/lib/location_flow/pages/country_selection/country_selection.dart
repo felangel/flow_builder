@@ -1,13 +1,14 @@
 import 'package:example/location_flow/location_flow.dart';
+import 'package:example/location_flow/pages/country_selection/country_selection_cubit.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'country_selection_cubit.dart';
-
 class CountrySelection extends StatelessWidget {
+  const CountrySelection({super.key});
+
   static MaterialPage<void> page() {
-    return MaterialPage<void>(child: CountrySelection());
+    return const MaterialPage<void>(child: CountrySelection());
   }
 
   @override
@@ -18,12 +19,14 @@ class CountrySelection extends StatelessWidget {
           context.read<LocationRepository>(),
         )..countriesRequested();
       },
-      child: CountrySelectionForm(),
+      child: const CountrySelectionForm(),
     );
   }
 }
 
 class CountrySelectionForm extends StatelessWidget {
+  const CountrySelectionForm({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +45,7 @@ class CountrySelectionForm extends StatelessWidget {
                 switch (state.status) {
                   case LocationStatus.initial:
                   case LocationStatus.loading:
-                    return LoadingIndicator();
+                    return const LoadingIndicator();
                   case LocationStatus.success:
                     return DropdownMenu(
                       hint: const Text('Select a Country'),
@@ -52,19 +55,20 @@ class CountrySelectionForm extends StatelessWidget {
                           .read<CountrySelectionCubit>()
                           .countrySelected(value),
                     );
-                  default:
-                    return LocationError();
+                  case LocationStatus.failure:
+                    return const LocationError();
                 }
               },
             ),
             BlocBuilder<CountrySelectionCubit, LocationState>(
               builder: (context, state) {
                 return TextButton(
-                  child: const Text('Submit'),
                   onPressed: state.selectedLocation != null
                       ? () => context.flow<Location>().update(
-                          (s) => s.copyWith(country: state.selectedLocation))
+                            (s) => s.copyWith(country: state.selectedLocation),
+                          )
                       : null,
+                  child: const Text('Submit'),
                 );
               },
             ),

@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-final _cities = '''[
+const _cities = '''
+[
 	{
 		"id": "1",
 		"name": "Bombuflat",
@@ -242094,15 +242095,16 @@ final _cities = '''[
 Future<List<City>> cities() => compute(_parseCities, _cities);
 
 List<City> _parseCities(String cities) {
-  return (json.decode(cities) as List)
-      .map(
-        (dynamic s) => City(
-          s['name'] as String,
-          int.parse(s['id'] as String),
-          int.parse(s['state_id'] as String),
-        ),
-      )
-      .toList();
+  return (json.decode(cities) as List).map(
+    (dynamic s) {
+      final map = s as Map<String, dynamic>;
+      return City(
+        map['name'] as String,
+        int.parse(map['id'] as String),
+        int.parse(map['state_id'] as String),
+      );
+    },
+  ).toList();
 }
 
 class City extends Equatable {

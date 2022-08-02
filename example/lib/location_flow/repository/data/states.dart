@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-final _states = '''[
+const _states = '''
+[
 	{
 		"id": "1",
 		"name": "Andaman and Nicobar Islands",
@@ -20499,15 +20500,16 @@ final _states = '''[
 Future<List<State>> states() => compute(_parseStates, _states);
 
 List<State> _parseStates(String states) {
-  return (json.decode(states) as List)
-      .map(
-        (dynamic s) => State(
-          s['name'] as String,
-          int.parse(s['id'] as String),
-          int.parse(s['country_id'] as String),
-        ),
-      )
-      .toList();
+  return (json.decode(states) as List).map(
+    (dynamic s) {
+      final map = s as Map<String, dynamic>;
+      return State(
+        map['name'] as String,
+        int.parse(map['id'] as String),
+        int.parse(map['country_id'] as String),
+      );
+    },
+  ).toList();
 }
 
 class State extends Equatable {
