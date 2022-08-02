@@ -170,6 +170,7 @@ class OnboardingStep extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   const HomePage._();
+
   static Page<void> page() => const MaterialPage<void>(child: HomePage._());
 
   @override
