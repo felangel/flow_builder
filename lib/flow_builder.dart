@@ -382,7 +382,7 @@ class _ConditionalWillPopScope extends StatelessWidget {
 /// Default [NavigatorObserver] for every [FlowBuilder].
 class _FlowNavigatorObserver extends NavigatorObserver {
   @override
-  void didPush(Route route, Route? previousRoute) {
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     if (route.settings.name != null) {
       _SystemNavigationObserver._updateLocation(route.settings.name);
@@ -390,7 +390,7 @@ class _FlowNavigatorObserver extends NavigatorObserver {
   }
 
   @override
-  void didPop(Route route, Route? previousRoute) {
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     if (previousRoute?.settings.name != null) {
       _SystemNavigationObserver._updateLocation(previousRoute?.settings.name);
@@ -398,7 +398,7 @@ class _FlowNavigatorObserver extends NavigatorObserver {
   }
 
   @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     if (newRoute?.settings.name != null) {
       _SystemNavigationObserver._updateLocation(newRoute?.settings.name);
@@ -445,7 +445,7 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 
-  static Future _popRoute() async {
+  static Future<dynamic> _popRoute() async {
     for (final interceptor in _popInterceptors) {
       final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
@@ -455,12 +455,13 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
 
   static Future<dynamic> _pushRoute(dynamic arguments) async {
     if (arguments is String) {
+      // ignore: parameter_assignments
       arguments = arguments.isEmpty ? _rootPath : arguments;
       final uri = Uri.parse(arguments);
       if (_location == uri) return;
       _location = uri;
       if (_pushInterceptors.isEmpty) {
-        return WidgetsBinding.instance!.handlePushRoute(arguments);
+        return WidgetsBinding.instance.handlePushRoute(arguments);
       }
       await _pushInterceptors.first.call(uri);
     } else {
@@ -468,8 +469,8 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 
-  static Future _handlePlatformMessage(MethodCall methodCall) {
-    return ServicesBinding.instance!.defaultBinaryMessenger
+  static Future<dynamic> _handlePlatformMessage(MethodCall methodCall) {
+    return ServicesBinding.instance.defaultBinaryMessenger
         .handlePlatformMessage(
       'flutter/navigation',
       const JSONMethodCodec().encodeMethodCall(methodCall),

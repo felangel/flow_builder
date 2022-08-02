@@ -44,7 +44,9 @@ void main() {
           home: FlowBuilder<dynamic>(
             state: 0,
             onGeneratePages: (dynamic state, pages) {
-              return const <Page>[MaterialPage<void>(child: SizedBox())];
+              return const <Page<dynamic>>[
+                MaterialPage<void>(child: SizedBox()),
+              ];
             },
             onLocationChanged: (Uri _, dynamic __) => '',
           ),
@@ -1008,7 +1010,7 @@ void main() {
               home: FlowBuilder<Uri>(
                 state: Uri(path: '/'),
                 onGeneratePages: (uri, pages) {
-                  return <Page>[
+                  return <Page<dynamic>>[
                     if (uri.pathSegments.isEmpty)
                       const MaterialPage<void>(
                         child: Scaffold(key: firstPageKey),
