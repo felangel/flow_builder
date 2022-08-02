@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 void main() => runApp(MyApp(locationRepository: LocationRepository()));
 
 class MyApp extends StatelessWidget {
-  MyApp({required LocationRepository locationRepository})
+  const MyApp({super.key, required LocationRepository locationRepository})
       : _locationRepository = locationRepository;
 
   final LocationRepository _locationRepository;
@@ -17,12 +17,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: _locationRepository,
-      child: MaterialApp(home: Home()),
+      child: const MaterialApp(home: Home()),
     );
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +44,7 @@ class Home extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   await Navigator.of(context).push(OnboardingFlow.route());
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -54,6 +62,7 @@ class Home extends StatelessWidget {
                   final profile = await Navigator.of(context).push(
                     ProfileFlow.route(),
                   );
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -71,6 +80,7 @@ class Home extends StatelessWidget {
                   final location = await Navigator.of(context).push(
                     LocationFlow.route(),
                   );
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -88,6 +98,7 @@ class Home extends StatelessWidget {
                   await Navigator.of(context).push<AuthenticationState>(
                     AuthenticationFlow.route(),
                   );
+                  if (!mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(

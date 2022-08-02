@@ -7,7 +7,10 @@ import 'package:flutter/widgets.dart';
 
 /// Signature for function which generates a [List<Page>] given an input of [T]
 /// and the current [List<Page>].
-typedef OnGeneratePages<T> = List<Page> Function(T state, List<Page> pages);
+typedef OnGeneratePages<T> = List<Page<dynamic>> Function(
+  T state,
+  List<Page<dynamic>> pages,
+);
 
 /// Signature for function which given an input flow state [T] will
 /// output a new flow state [T].
@@ -39,7 +42,7 @@ typedef FlowCallback<T> = T Function(T state);
 class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
   const FlowBuilder({
-    Key? key,
+    super.key,
     required this.onGeneratePages,
     this.state,
     this.onComplete,
@@ -52,8 +55,7 @@ class FlowBuilder<T> extends StatefulWidget {
         assert(
           !(state != null && controller != null),
           'cannot provide controller and state',
-        ),
-        super(key: key);
+        );
 
   /// Builds a [List<Page>] based on the current state.
   final OnGeneratePages<T> onGeneratePages;
@@ -73,14 +75,14 @@ class FlowBuilder<T> extends StatefulWidget {
   final List<NavigatorObserver> observers;
 
   @override
-  _FlowBuilderState<T> createState() => _FlowBuilderState<T>();
+  State<FlowBuilder<T>> createState() => _FlowBuilderState<T>();
 }
 
 class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   late FlowController<T> _controller;
 
   final _history = ListQueue<T>();
-  var _pages = <Page>[];
+  var _pages = <Page<dynamic>>[];
   var _didPop = false;
   late final GlobalObjectKey<NavigatorState> _navigatorKey;
   NavigatorState? get _navigator => _navigatorKey.currentState;
@@ -118,6 +120,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   }
 
   FlowController<T> _initController(T? state) {
+    // ignore: null_check_on_nullable_type_parameter
     return _controller = (widget.controller ?? FlowController(state!))
       ..addListener(_listener);
   }
@@ -138,7 +141,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     if (mounted) {
       final popHandled = await _navigator?.maybePop() ?? false;
       if (popHandled) return true;
-      if (!_canPop) return await Navigator.of(context).maybePop();
+      if (mounted && !_canPop) return Navigator.of(context).maybePop();
       return false;
     }
     return false;
@@ -196,10 +199,10 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
 class _InheritedFlowController<T> extends InheritedWidget {
   const _InheritedFlowController({
-    Key? key,
+    super.key,
     required this.controller,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   final FlowController<T> controller;
 
@@ -298,7 +301,7 @@ class FlowController<T> extends ChangeNotifier {
 /// {@endtemplate}
 class FakeFlowController<T> extends FlowController<T> {
   /// {@macro fake_flow_controller}
-  FakeFlowController(T state) : super(state);
+  FakeFlowController(super.state);
 
   @override
   T get state => _state;
@@ -320,11 +323,10 @@ class FakeFlowController<T> extends FlowController<T> {
 
 class _ConditionalWillPopScope extends StatelessWidget {
   const _ConditionalWillPopScope({
-    Key? key,
     required this.condition,
     required this.onWillPop,
     required this.child,
-  }) : super(key: key);
+  });
 
   final bool condition;
   final Widget child;
@@ -359,7 +361,7 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 
-  static Future _popRoute() async {
+  static Future<dynamic> _popRoute() async {
     for (final interceptor in _interceptors) {
       final preventDefault = await interceptor();
       if (preventDefault) return Future<dynamic>.value();
@@ -367,7 +369,7 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     return WidgetsBinding.instance.handlePopRoute();
   }
 
-  static Future _pushRoute(dynamic arguments) async {
+  static Future<dynamic> _pushRoute(dynamic arguments) async {
     if (arguments is String) {
       return WidgetsBinding.instance.handlePushRoute(arguments);
     } else {

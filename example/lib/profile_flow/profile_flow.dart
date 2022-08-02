@@ -2,17 +2,23 @@ import 'package:equatable/equatable.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
-List<Page> onGenerateProfilePages(Profile profile, List<Page> pages) {
+List<Page<dynamic>> onGenerateProfilePages(
+  Profile profile,
+  List<Page<dynamic>> pages,
+) {
   return [
-    MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
-    if (profile.name != null) MaterialPage<void>(child: ProfileAgeForm()),
-    if (profile.age != null) MaterialPage<void>(child: ProfileWeightForm()),
+    const MaterialPage<void>(child: ProfileNameForm(), name: '/profile'),
+    if (profile.name != null) const MaterialPage<void>(child: ProfileAgeForm()),
+    if (profile.age != null)
+      const MaterialPage<void>(child: ProfileWeightForm()),
   ];
 }
 
 class ProfileFlow extends StatelessWidget {
+  const ProfileFlow._();
+
   static Route<Profile> route() {
-    return MaterialPageRoute(builder: (_) => ProfileFlow());
+    return MaterialPageRoute(builder: (_) => const ProfileFlow._());
   }
 
   @override
@@ -25,8 +31,10 @@ class ProfileFlow extends StatelessWidget {
 }
 
 class ProfileNameForm extends StatefulWidget {
+  const ProfileNameForm({super.key});
+
   @override
-  _ProfileNameFormState createState() => _ProfileNameFormState();
+  State<ProfileNameForm> createState() => _ProfileNameFormState();
 }
 
 class _ProfileNameFormState extends State<ProfileNameForm> {
@@ -47,7 +55,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Column(
             children: <Widget>[
               TextField(
@@ -58,8 +66,8 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
                 ),
               ),
               ElevatedButton(
-                child: const Text('Continue'),
                 onPressed: _name.isNotEmpty ? _continuePressed : null,
+                child: const Text('Continue'),
               )
             ],
           ),
@@ -70,8 +78,10 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
 }
 
 class ProfileAgeForm extends StatefulWidget {
+  const ProfileAgeForm({super.key});
+
   @override
-  _ProfileAgeFormState createState() => _ProfileAgeFormState();
+  State<ProfileAgeForm> createState() => _ProfileAgeFormState();
 }
 
 class _ProfileAgeFormState extends State<ProfileAgeForm> {
@@ -87,7 +97,7 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
       appBar: AppBar(title: const Text('Age')),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Column(
             children: <Widget>[
               TextField(
@@ -99,8 +109,8 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
                 keyboardType: TextInputType.number,
               ),
               ElevatedButton(
-                child: const Text('Continue'),
                 onPressed: _age != null ? _continuePressed : null,
+                child: const Text('Continue'),
               )
             ],
           ),
@@ -111,8 +121,10 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
 }
 
 class ProfileWeightForm extends StatefulWidget {
+  const ProfileWeightForm({super.key});
+
   @override
-  _ProfileWeightFormState createState() => _ProfileWeightFormState();
+  State<ProfileWeightForm> createState() => _ProfileWeightFormState();
 }
 
 class _ProfileWeightFormState extends State<ProfileWeightForm> {
@@ -130,7 +142,7 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
       appBar: AppBar(title: const Text('Weight')),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Column(
             children: <Widget>[
               TextField(
@@ -144,8 +156,8 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
                 keyboardType: TextInputType.number,
               ),
               ElevatedButton(
-                child: const Text('Continue'),
                 onPressed: _weight != null ? _continuePressed : null,
+                child: const Text('Continue'),
               )
             ],
           ),

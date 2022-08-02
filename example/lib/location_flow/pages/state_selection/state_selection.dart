@@ -1,9 +1,8 @@
 import 'package:example/location_flow/location_flow.dart';
+import 'package:example/location_flow/pages/state_selection/state_selection_cubit.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'state_selection_cubit.dart';
 
 class StateSelection extends StatelessWidget {
   const StateSelection({super.key, required this.country});
@@ -21,12 +20,14 @@ class StateSelection extends StatelessWidget {
         return StateSelectionCubit(context.read<LocationRepository>())
           ..statesRequested(country);
       },
-      child: StateSelectionForm(),
+      child: const StateSelectionForm(),
     );
   }
 }
 
 class StateSelectionForm extends StatelessWidget {
+  const StateSelectionForm({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +41,7 @@ class StateSelectionForm extends StatelessWidget {
                 switch (state.status) {
                   case LocationStatus.initial:
                   case LocationStatus.loading:
-                    return LoadingIndicator();
+                    return const LoadingIndicator();
                   case LocationStatus.success:
                     return DropdownMenu(
                       hint: const Text('Select a State'),
@@ -50,19 +51,20 @@ class StateSelectionForm extends StatelessWidget {
                           .read<StateSelectionCubit>()
                           .stateSelected(value),
                     );
-                  default:
-                    return LocationError();
+                  case LocationStatus.failure:
+                    return const LocationError();
                 }
               },
             ),
             BlocBuilder<StateSelectionCubit, LocationState>(
               builder: (context, state) {
                 return TextButton(
-                  child: const Text('Submit'),
                   onPressed: state.selectedLocation != null
                       ? () => context.flow<Location>().update(
-                          (s) => s.copyWith(state: state.selectedLocation))
+                            (s) => s.copyWith(state: state.selectedLocation),
+                          )
                       : null,
+                  child: const Text('Submit'),
                 );
               },
             ),

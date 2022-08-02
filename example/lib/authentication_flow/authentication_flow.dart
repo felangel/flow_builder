@@ -17,11 +17,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 }
 
 class AuthenticationFlow extends StatelessWidget {
+  const AuthenticationFlow._();
+
   static Route<AuthenticationState> route() {
     return MaterialPageRoute(
       builder: (_) => BlocProvider(
         create: (_) => AuthenticationCubit(),
-        child: AuthenticationFlow(),
+        child: const AuthenticationFlow._(),
       ),
     );
   }
@@ -30,12 +32,11 @@ class AuthenticationFlow extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlowBuilder<AuthenticationState>(
       state: context.select((AuthenticationCubit cubit) => cubit.state),
-      onGeneratePages: (AuthenticationState state, List<Page> pages) {
+      onGeneratePages: (AuthenticationState state, List<Page<dynamic>> pages) {
         switch (state) {
           case AuthenticationState.authenticated:
             return [HomePage.page()];
           case AuthenticationState.unauthenticated:
-          default:
             return [SplashPage.page()];
         }
       },
@@ -44,7 +45,9 @@ class AuthenticationFlow extends StatelessWidget {
 }
 
 class SplashPage extends StatelessWidget {
-  static Page page() => MaterialPage<void>(child: SplashPage());
+  const SplashPage._();
+
+  static Page<void> page() => const MaterialPage<void>(child: SplashPage._());
 
   @override
   Widget build(BuildContext context) {
@@ -80,12 +83,13 @@ class SplashPage extends StatelessWidget {
 }
 
 class OnboardingPage extends StatefulWidget {
+  const OnboardingPage._();
   static Route<void> route() {
-    return MaterialPageRoute(builder: (_) => OnboardingPage());
+    return MaterialPageRoute(builder: (_) => const OnboardingPage._());
   }
 
   @override
-  _OnboardingPageState createState() => _OnboardingPageState();
+  State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
@@ -114,7 +118,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       ),
       body: FlowBuilder<int>(
         controller: _controller,
-        onGeneratePages: (int state, List<Page> pages) {
+        onGeneratePages: (int state, List<Page<dynamic>> pages) {
           return [
             for (var i = 0; i <= state; i++) OnboardingStep.page(i),
           ];
@@ -127,7 +131,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 class OnboardingStep extends StatelessWidget {
   const OnboardingStep({super.key, required this.step});
 
-  static Page page(int step) {
+  static Page<void> page(int step) {
     return MaterialPage<void>(child: OnboardingStep(step: step));
   }
 
@@ -145,10 +149,10 @@ class OnboardingStep extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(
-                child: const Text('Previous'),
                 onPressed: context.flow<int>().state <= 0
                     ? null
                     : () => context.flow<int>().update((s) => s - 1),
+                child: const Text('Previous'),
               ),
               TextButton(
                 child: const Text('Next'),
@@ -165,7 +169,8 @@ class OnboardingStep extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  static Page page() => MaterialPage<void>(child: HomePage());
+  const HomePage._();
+  static Page<void> page() => const MaterialPage<void>(child: HomePage._());
 
   @override
   Widget build(BuildContext context) {

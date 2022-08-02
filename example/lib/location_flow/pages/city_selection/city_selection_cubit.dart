@@ -7,14 +7,14 @@ class CitySelectionCubit extends Cubit<LocationState> {
 
   final LocationRepository _locationRepository;
 
-  void citiesRequested(String city) async {
+  Future<void> citiesRequested(String city) async {
     emit(const LocationState.loading());
 
     try {
       final cityList = await _locationRepository.getCities(city);
       final cities = cityList.map((c) => c.name).toList();
       emit(LocationState.success(cities));
-    } on Exception {
+    } catch (_) {
       emit(const LocationState.failure());
     }
   }
