@@ -702,6 +702,91 @@ void main() {
       expect(find.byKey(button2Key), findsNothing);
     });
 
+    testWidgets(
+        'navigation stack changes upon back pressed '
+        'still allows future state changes to work', (tester) async {
+      const buttonKey = Key('__button__');
+      const scaffoldKey = Key('__scaffold__');
+      var numBuilds = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<int>(
+            state: 0,
+            onGeneratePages: (state, pages) {
+              numBuilds++;
+              if (state == 0) {
+                return [
+                  MaterialPage<void>(
+                    child: Builder(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(),
+                        body: TextButton(
+                          key: buttonKey,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            context.flow<int>().update((s) => s + 1);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ];
+              }
+              if (state == 1) {
+                return [
+                  MaterialPage<void>(
+                    child: Builder(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(),
+                        body: TextButton(
+                          key: buttonKey,
+                          child: const Text('Button'),
+                          onPressed: () {
+                            context.flow<int>().update((s) => 1);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  MaterialPage<void>(
+                    child: Scaffold(
+                      key: scaffoldKey,
+                      appBar: AppBar(),
+                    ),
+                  ),
+                ];
+              }
+              return <Page>[];
+            },
+          ),
+        ),
+      );
+      expect(numBuilds, 1);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 2);
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(scaffoldKey), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 2);
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.byKey(scaffoldKey), findsNothing);
+
+      await tester.tap(find.byKey(buttonKey));
+      await tester.pumpAndSettle();
+
+      expect(numBuilds, 3);
+      expect(find.byKey(buttonKey), findsNothing);
+      expect(find.byKey(scaffoldKey), findsOneWidget);
+    });
+
     group('pushRoute', () {
       testWidgets(
           'system pushRoute is passed to WidgetsBinding if contains arguments',
