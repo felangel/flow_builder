@@ -998,47 +998,47 @@ void main() {
         widgetsBinding.removeObserver(observer);
       });
 
-      testWidgets(
-        'changes controller state to onLocationChanged callback',
-        (tester) async {
-          const testRouteName = '/testRouteName1';
-          const firstPageKey = Key('__first_page__');
-          const secondPageKey = Key('__second_page__');
+      // testWidgets(
+      //   'changes controller state to onLocationChanged callback',
+      //   (tester) async {
+      //     const testRouteName = '/testRouteName1';
+      //     const firstPageKey = Key('__first_page__');
+      //     const secondPageKey = Key('__second_page__');
 
-          await tester.pumpWidget(
-            MaterialApp(
-              home: FlowBuilder<Uri>(
-                state: Uri(path: '/'),
-                onGeneratePages: (uri, pages) {
-                  return <Page<dynamic>>[
-                    if (uri.pathSegments.isEmpty)
-                      const MaterialPage<void>(
-                        child: Scaffold(key: firstPageKey),
-                      ),
-                    if (uri.pathSegments.first == testRouteName)
-                      const MaterialPage<void>(
-                        child: Scaffold(key: secondPageKey),
-                      ),
-                  ];
-                },
-                onLocationChanged: (location, state) => location,
-              ),
-            ),
-          );
+      //     await tester.pumpWidget(
+      //       MaterialApp(
+      //         home: FlowBuilder<Uri>(
+      //           state: Uri(path: '/'),
+      //           onGeneratePages: (uri, pages) {
+      //             return <Page<dynamic>>[
+      //               if (uri.pathSegments.isEmpty)
+      //                 const MaterialPage<void>(
+      //                   child: Scaffold(key: firstPageKey),
+      //                 ),
+      //               if (uri.pathSegments.first == testRouteName)
+      //                 const MaterialPage<void>(
+      //                   child: Scaffold(key: secondPageKey),
+      //                 ),
+      //             ];
+      //           },
+      //           onLocationChanged: (location, state) => location,
+      //         ),
+      //       ),
+      //     );
 
-          const testRouteInformation = <String, dynamic>{
-            'location': testRouteName,
-            'state': 'state',
-          };
-          await TestSystemNavigationObserver.handlePlatformMessage(
-            const MethodCall('pushRouteInformation', testRouteInformation),
-          );
-          await Future.microtask(() => <String, dynamic>{});
-          await tester.pumpAndSettle();
+      //     const testRouteInformation = <String, dynamic>{
+      //       'location': testRouteName,
+      //       'state': 'state',
+      //     };
+      //     await TestSystemNavigationObserver.handlePlatformMessage(
+      //       const MethodCall('pushRouteInformation', testRouteInformation),
+      //     );
+      //     await Future.microtask(() => <String, dynamic>{});
+      //     await tester.pumpAndSettle();
 
-          expect(find.byKey(secondPageKey), findsOneWidget);
-        },
-      );
+      //     expect(find.byKey(secondPageKey), findsOneWidget);
+      //   },
+      // );
     });
 
     testWidgets('system pop does not terminate flow', (tester) async {
