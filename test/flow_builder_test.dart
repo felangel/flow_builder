@@ -5,35 +5,48 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('FlowBuilder', () {
-    test('throws when state is null and controller is null', () async {
-      expect(
-        () => FlowBuilder(
-          onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
-        ),
-        throwsAssertionError,
-      );
-    });
+    group('constructor', () {
+      test('throws when state is null and controller is null', () async {
+        expect(
+          () => FlowBuilder(
+            onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
+          ),
+          throwsAssertionError,
+        );
+      });
 
-    test('throws when state and controller are both provided', () async {
-      expect(
-        () => FlowBuilder(
-          onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
-          state: '',
-          controller: FlowController(''),
-        ),
-        throwsAssertionError,
-      );
-    });
+      test('throws when state and controller are both provided', () async {
+        expect(
+          () => FlowBuilder(
+            onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
+            state: '',
+            controller: FlowController(''),
+          ),
+          throwsAssertionError,
+        );
+      });
 
-    test('does not throw when state is null if controller is present',
-        () async {
-      expect(
-        () => FlowBuilder(
-          onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
-          controller: FlowController(''),
-        ),
-        isNot(throwsAssertionError),
-      );
+      test('does not throw when state is null if controller is present',
+          () async {
+        expect(
+          () => FlowBuilder(
+            onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
+            controller: FlowController(''),
+          ),
+          isNot(throwsAssertionError),
+        );
+      });
+
+      test('does not throw when controller is null if state is present',
+          () async {
+        expect(
+          () => FlowBuilder(
+            state: 0,
+            onGeneratePages: (dynamic _, List<Page<dynamic>> __) => [],
+          ),
+          isNot(throwsAssertionError),
+        );
+      });
     });
 
     testWidgets(
