@@ -50,6 +50,25 @@ void main() {
     });
 
     testWidgets(
+        'initializes controller when onLocationChanged callback is provided',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: FlowBuilder<dynamic>(
+            state: 0,
+            onGeneratePages: (dynamic state, pages) {
+              return const <Page<dynamic>>[
+                MaterialPage<void>(child: SizedBox()),
+              ];
+            },
+            onLocationChanged: (Uri _, dynamic __) => '',
+          ),
+        ),
+      );
+      expect(find.byType(FlowBuilder), findsOneWidget);
+    });
+
+    testWidgets(
         'throws FlutterError when context.flow is called '
         'outside of FlowBuilder', (tester) async {
       await tester.pumpWidget(
@@ -991,6 +1010,48 @@ void main() {
         expect(observer.pushCount, 0);
         widgetsBinding.removeObserver(observer);
       });
+
+      // testWidgets(
+      //   'changes controller state to onLocationChanged callback',
+      //   (tester) async {
+      //     const testRouteName = '/testRouteName1';
+      //     const firstPageKey = Key('__first_page__');
+      //     const secondPageKey = Key('__second_page__');
+
+      //     await tester.pumpWidget(
+      //       MaterialApp(
+      //         home: FlowBuilder<Uri>(
+      //           state: Uri(path: '/'),
+      //           onGeneratePages: (uri, pages) {
+      //             return <Page<dynamic>>[
+      //               if (uri.pathSegments.isEmpty)
+      //                 const MaterialPage<void>(
+      //                   child: Scaffold(key: firstPageKey),
+      //                 ),
+      //               if (uri.pathSegments.first == testRouteName)
+      //                 const MaterialPage<void>(
+      //                   child: Scaffold(key: secondPageKey),
+      //                 ),
+      //             ];
+      //           },
+      //           onLocationChanged: (location, state) => location,
+      //         ),
+      //       ),
+      //     );
+
+      //     const testRouteInformation = <String, dynamic>{
+      //       'location': testRouteName,
+      //       'state': 'state',
+      //     };
+      //     await TestSystemNavigationObserver.handlePlatformMessage(
+      //       const MethodCall('pushRouteInformation', testRouteInformation),
+      //     );
+      //     await Future.microtask(() => <String, dynamic>{});
+      //     await tester.pumpAndSettle();
+
+      //     expect(find.byKey(secondPageKey), findsOneWidget);
+      //   },
+      // );
     });
 
     testWidgets('system pop does not terminate flow', (tester) async {
@@ -1377,7 +1438,7 @@ void main() {
       );
 
       final navigators = tester.widgetList<Navigator>(find.byType(Navigator));
-      expect(navigators.last.observers, equals(observers));
+      expect(navigators.last.observers, containsAll(observers));
     });
 
     testWidgets('SystemNavigator.pop respects when WillPopScope returns false',

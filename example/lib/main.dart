@@ -2,6 +2,7 @@ import 'package:example/authentication_flow/authentication_flow.dart';
 import 'package:example/location_flow/location_flow.dart';
 import 'package:example/onboarding_flow/onboarding_flow.dart';
 import 'package:example/profile_flow/profile_flow.dart';
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,13 +18,42 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: _locationRepository,
-      child: const MaterialApp(home: Home()),
+      child: const MaterialApp(home: UrlFlowBuilder()),
+    );
+  }
+}
+
+class UrlFlowBuilder extends StatelessWidget {
+  const UrlFlowBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FlowBuilder<Uri>(
+      state: Uri(path: '/'),
+      onGeneratePages: (uri, pages) {
+        if (uri.pathSegments.isEmpty) return [Home.page()];
+        return [
+          Home.page(),
+          if (uri.pathSegments.first == 'profile') ProfileFlow.page(),
+          if (uri.pathSegments.first == 'onboarding') OnboardingFlow.page(),
+          if (uri.pathSegments.first == 'location') LocationFlow.page(),
+          if (uri.pathSegments.first == 'auth') AuthenticationFlow.page(),
+        ];
+      },
+      onLocationChanged: (location, state) => location,
+      onDidPop: (dynamic result) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text('$result')));
+      },
     );
   }
 }
 
 class Home extends StatefulWidget {
   const Home({super.key});
+
+  static Page<void> page() => const MaterialPage<void>(name: '/', child: Home());
 
   @override
   State<Home> createState() => _HomeState();

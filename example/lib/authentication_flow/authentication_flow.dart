@@ -21,7 +21,18 @@ class AuthenticationFlow extends StatelessWidget {
 
   static Route<AuthenticationState> route() {
     return MaterialPageRoute(
+      settings: const RouteSettings(name: '/auth'),
       builder: (_) => BlocProvider(
+        create: (_) => AuthenticationCubit(),
+        child: const AuthenticationFlow._(),
+      ),
+    );
+  }
+
+  static Page<AuthenticationState> page() {
+    return MaterialPage(
+      name: '/auth',
+      child: BlocProvider(
         create: (_) => AuthenticationCubit(),
         child: const AuthenticationFlow._(),
       ),

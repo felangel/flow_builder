@@ -15,6 +15,7 @@ List<Page<dynamic>> onGenerateOnboardingPages(
   List<Page<dynamic>> pages,
 ) {
   switch (state) {
+    case OnboardingState.onboardingComplete:
     case OnboardingState.usageComplete:
       return [
         OnboardingWelcome.page(),
@@ -27,7 +28,6 @@ List<Page<dynamic>> onGenerateOnboardingPages(
         OnboardingUsage.page(),
       ];
     case OnboardingState.initial:
-    case OnboardingState.onboardingComplete:
       return [OnboardingWelcome.page()];
   }
 }
@@ -35,16 +35,29 @@ List<Page<dynamic>> onGenerateOnboardingPages(
 class OnboardingFlow extends StatelessWidget {
   const OnboardingFlow._();
 
+  static Page<OnboardingState> page() {
+    return const MaterialPage(child: OnboardingFlow._());
+  }
+
   static Route<OnboardingState> route() {
-    return MaterialPageRoute(builder: (_) => const OnboardingFlow._());
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/onboarding/0'),
+      builder: (_) => const OnboardingFlow._(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder(
+    return FlowBuilder<OnboardingState>(
       state: OnboardingState.initial,
       observers: [HeroController()],
       onGeneratePages: onGenerateOnboardingPages,
+      onLocationChanged: (location, state) {
+        final index = location.pathSegments.length > 1
+            ? int.tryParse(location.pathSegments[1]) ?? 0
+            : 0;
+        return OnboardingState.values[index];
+      },
     );
   }
 }
