@@ -145,7 +145,7 @@ class OnboardingStep extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Step $step', style: theme.textTheme.headline1),
+          Text('Step $step', style: theme.textTheme.displayLarge),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
