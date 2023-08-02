@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: _locationRepository,
-      child: const MaterialApp(home: Home()),
+      child: MaterialApp(
+        theme: ThemeData(useMaterial3: true),
+        home: const Home(),
+      ),
     );
   }
 }
