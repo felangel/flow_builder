@@ -69,6 +69,7 @@ class SplashPage extends StatelessWidget {
                 Navigator.of(context).push(OnboardingPage.route());
               },
             ),
+            const SizedBox(height: 8),
             ElevatedButton(
               child: const Text('Sign In'),
               onPressed: () {
