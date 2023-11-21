@@ -68,7 +68,7 @@ class _ProfileNameFormState extends State<ProfileNameForm> {
               ElevatedButton(
                 onPressed: _name.isNotEmpty ? _continuePressed : null,
                 child: const Text('Continue'),
-              )
+              ),
             ],
           ),
         ),
@@ -111,7 +111,7 @@ class _ProfileAgeFormState extends State<ProfileAgeForm> {
               ElevatedButton(
                 onPressed: _age != null ? _continuePressed : null,
                 child: const Text('Continue'),
-              )
+              ),
             ],
           ),
         ),
@@ -158,7 +158,7 @@ class _ProfileWeightFormState extends State<ProfileWeightForm> {
               ElevatedButton(
                 onPressed: _weight != null ? _continuePressed : null,
                 child: const Text('Continue'),
-              )
+              ),
             ],
           ),
         ),
