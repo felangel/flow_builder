@@ -43,7 +43,7 @@ class CitySelectionForm extends StatelessWidget {
                   case LocationStatus.loading:
                     return const LoadingIndicator();
                   case LocationStatus.success:
-                    return DropdownMenu(
+                    return Dropdown(
                       hint: const Text('Select a City'),
                       items: state.locations,
                       value: state.selectedLocation,

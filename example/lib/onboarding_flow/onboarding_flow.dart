@@ -75,7 +75,7 @@ class OnboardingWelcome extends StatelessWidget {
                 children: [
                   Text(
                     'Welcome Text',
-                    style: theme.textTheme.headline3,
+                    style: theme.textTheme.displaySmall,
                   ),
                 ],
               ),
@@ -139,7 +139,7 @@ class OnboardingUsage extends StatelessWidget {
                 children: [
                   Text(
                     'Usage Text',
-                    style: theme.textTheme.headline3,
+                    style: theme.textTheme.displaySmall,
                   ),
                 ],
               ),
@@ -207,7 +207,7 @@ class OnboardingComplete extends StatelessWidget {
                 children: [
                   Text(
                     'All Done!',
-                    style: theme.textTheme.headline3,
+                    style: theme.textTheme.displaySmall,
                     textAlign: TextAlign.center,
                   ),
                 ],
