@@ -531,13 +531,15 @@ void main() {
 
     testWidgets('system back button pops entire flow', (tester) async {
       var systemPopCallCount = 0;
-      tester.binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, (call) {
-        if (call.method == 'SystemNavigator.pop') {
-          systemPopCallCount++;
-        }
-        return null;
-      });
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) {
+          if (call.method == 'SystemNavigator.pop') {
+            systemPopCallCount++;
+          }
+          return null;
+        },
+      );
       const buttonKey = Key('__button__');
       const scaffoldKey = Key('__scaffold__');
       await tester.pumpWidget(
@@ -580,13 +582,15 @@ void main() {
     testWidgets('system back button pops routes that have been pushed',
         (tester) async {
       var systemPopCallCount = 0;
-      tester.binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, (call) {
-        if (call.method == 'SystemNavigator.pop') {
-          systemPopCallCount++;
-        }
-        return null;
-      });
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) {
+          if (call.method == 'SystemNavigator.pop') {
+            systemPopCallCount++;
+          }
+          return null;
+        },
+      );
       const buttonKey = Key('__button__');
       const scaffoldKey = Key('__scaffold__');
       await tester.pumpWidget(
@@ -643,13 +647,15 @@ void main() {
     testWidgets('system back button pops typed routes that have been pushed',
         (tester) async {
       var systemPopCallCount = 0;
-      tester.binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, (call) {
-        if (call.method == 'SystemNavigator.pop') {
-          systemPopCallCount++;
-        }
-        return null;
-      });
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) {
+          if (call.method == 'SystemNavigator.pop') {
+            systemPopCallCount++;
+          }
+          return null;
+        },
+      );
       const buttonKey = Key('__button__');
       const scaffoldKey = Key('__scaffold__');
       await tester.pumpWidget(
@@ -1409,7 +1415,7 @@ void main() {
                   ),
                 ),
               ),
-            )
+            ),
           ];
         },
       );
@@ -1465,7 +1471,7 @@ void main() {
                   ),
                 ),
               ),
-            )
+            ),
           ];
         },
       );

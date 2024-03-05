@@ -47,7 +47,7 @@ class CountrySelectionForm extends StatelessWidget {
                   case LocationStatus.loading:
                     return const LoadingIndicator();
                   case LocationStatus.success:
-                    return DropdownMenuButton(
+                    return Dropdown(
                       hint: const Text('Select a Country'),
                       items: state.locations,
                       value: state.selectedLocation,

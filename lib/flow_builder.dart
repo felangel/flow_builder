@@ -50,6 +50,7 @@ class FlowBuilder<T> extends StatefulWidget {
     this.onComplete,
     this.controller,
     this.observers = const <NavigatorObserver>[],
+    this.clipBehavior = Clip.hardEdge,
   })  : assert(
           state != null || controller != null,
           'requires either state or controller',
@@ -75,6 +76,12 @@ class FlowBuilder<T> extends StatefulWidget {
 
   /// A list of [NavigatorObserver] for this [FlowBuilder].
   final List<NavigatorObserver> observers;
+
+  /// In cases where clipping is not desired, consider setting this property to
+  /// [Clip.none].
+  ///
+  /// Defaults to [Clip.hardEdge].
+  final Clip clipBehavior;
 
   @override
   State<FlowBuilder<T>> createState() => _FlowBuilderState<T>();
@@ -181,6 +188,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
           key: _navigatorKey,
           pages: _pages,
           observers: widget.observers,
+          clipBehavior: widget.clipBehavior,
           onPopPage: (route, dynamic result) {
             if (_history.length > 1) {
               _history.removeLast();

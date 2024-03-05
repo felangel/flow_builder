@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DropdownMenuButton extends StatelessWidget {
-  const DropdownMenuButton({
+class Dropdown extends StatelessWidget {
+  const Dropdown({
     super.key,
     required this.items,
     required this.onChanged,

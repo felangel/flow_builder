@@ -2,8 +2,9 @@ name: flow_builder
 description: Flutter Flows made easy! A Flutter package which simplifies flows with a flexible, declarative API.
 repository: https://github.com/felangel/flow_builder
 homepage: https://github.com/felangel/flow_builder
+topics: [navigation, routing]
 
-version: 0.0.9
+version: 0.0.10
 
 environment:
   sdk: ">=2.17.0 <4.0.0"

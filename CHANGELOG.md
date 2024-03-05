@@ -1,3 +1,8 @@
+# 0.0.10
+
+- feat: add optional `clipBehavior` ([#113](https://github.com/felangel/flow_builder/pull/113))
+- refactor: update to Flutter 3.13.9
+
 # 0.0.9
 
 - fix: cannot pop with Android back button

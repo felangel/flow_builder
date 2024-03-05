@@ -160,7 +160,7 @@ class OnboardingStep extends StatelessWidget {
                 onPressed: () {
                   context.flow<int>().update((s) => s + 1);
                 },
-              )
+              ),
             ],
           ),
         ],
@@ -184,7 +184,7 @@ class HomePage extends StatelessWidget {
             onPressed: () {
               context.read<AuthenticationCubit>().logout();
             },
-          )
+          ),
         ],
       ),
       body: const Center(child: Text('Home')),
