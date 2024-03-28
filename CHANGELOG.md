@@ -1,3 +1,8 @@
+# 1.0.0
+
+- **BREAKING**: replace deprecated `WillPopScope` with `PopScope`
+- refactor: update to Flutter >=3.16.0, dart >=3.2.0 
+
 # 0.0.10
 
 - feat: add optional `clipBehavior` ([#113](https://github.com/felangel/flow_builder/pull/113))

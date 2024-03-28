@@ -148,7 +148,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
     if (mounted) {
       final popHandled = await _navigator?.maybePop() ?? false;
       if (popHandled) return true;
-      if (mounted && !_canPop) return Navigator.of(context).maybePop();
+      if (mounted && !_canPop) _navigator?.pop();
       return false;
     }
     return false;
@@ -176,12 +176,9 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
   Widget build(BuildContext context) {
     return _InheritedFlowController(
       controller: _controller,
-      child: _ConditionalWillPopScope(
+      child: _ConditionalPopScope(
         condition: _canPop,
-        onWillPop: () async {
-          await _navigator?.maybePop();
-          return false;
-        },
+        onPopInvoked: (bool _) => _navigator?.maybePop(),
         child: Navigator(
           key: _navigatorKey,
           pages: _pages,
@@ -197,6 +194,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
               _pages.removeLast();
             }
             setState(() {});
+            route.onPopInvoked(true);
             return route.didPop(result);
           },
         ),
@@ -329,20 +327,26 @@ class FakeFlowController<T> extends FlowController<T> {
   }
 }
 
-class _ConditionalWillPopScope extends StatelessWidget {
-  const _ConditionalWillPopScope({
+class _ConditionalPopScope extends StatelessWidget {
+  const _ConditionalPopScope({
     required this.condition,
-    required this.onWillPop,
+    required this.onPopInvoked,
     required this.child,
   });
 
   final bool condition;
   final Widget child;
-  final Future<bool> Function() onWillPop;
+  final PopInvokedCallback onPopInvoked;
 
   @override
   Widget build(BuildContext context) {
-    return condition ? WillPopScope(onWillPop: onWillPop, child: child) : child;
+    return condition
+        ? PopScope(
+            canPop: false,
+            onPopInvoked: onPopInvoked,
+            child: child,
+          )
+        : child;
   }
 }
 
