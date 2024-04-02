@@ -22,14 +22,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +39,7 @@ class _HomeState extends State<Home> {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   await Navigator.of(context).push(OnboardingFlow.route());
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -62,7 +57,7 @@ class _HomeState extends State<Home> {
                   final profile = await Navigator.of(context).push(
                     ProfileFlow.route(),
                   );
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -80,7 +75,7 @@ class _HomeState extends State<Home> {
                   final location = await Navigator.of(context).push(
                     LocationFlow.route(),
                   );
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -98,7 +93,7 @@ class _HomeState extends State<Home> {
                   await Navigator.of(context).push<AuthenticationState>(
                     AuthenticationFlow.route(),
                   );
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(

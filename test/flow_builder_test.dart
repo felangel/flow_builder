@@ -1063,7 +1063,7 @@ void main() {
       expect(find.byKey(button2Key), findsOneWidget);
     });
 
-    testWidgets('onWillPop pops top page when there are multiple',
+    testWidgets('Navigator.pop pops top page when there are multiple',
         (tester) async {
       const button1Key = Key('__button1__');
       const button2Key = Key('__button2__');
@@ -1084,10 +1084,14 @@ void main() {
                 ),
                 MaterialPage<void>(
                   child: Scaffold(
-                    body: TextButton(
-                      key: button2Key,
-                      child: const Text('Button'),
-                      onPressed: () {},
+                    body: Builder(
+                      builder: (context) {
+                        return TextButton(
+                          key: button2Key,
+                          child: const Text('Button'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -1100,19 +1104,14 @@ void main() {
       expect(find.byKey(button1Key), findsNothing);
       expect(find.byKey(button2Key), findsOneWidget);
 
-      final willPopScope = tester.widget<WillPopScope>(
-        find.byType(WillPopScope),
-      );
-      final result = await willPopScope.onWillPop!();
-      expect(result, isFalse);
-
+      await tester.tap(find.byKey(button2Key));
       await tester.pumpAndSettle();
 
       expect(find.byKey(button1Key), findsOneWidget);
       expect(find.byKey(button2Key), findsNothing);
     });
 
-    testWidgets('onWillPop does not exist for only one page', (tester) async {
+    testWidgets('PopScope does not exist for only one page', (tester) async {
       const button1Key = Key('__button1__');
       await tester.pumpWidget(
         MaterialApp(
@@ -1136,7 +1135,7 @@ void main() {
       );
 
       expect(find.byKey(button1Key), findsOneWidget);
-      expect(find.byType(WillPopScope), findsNothing);
+      expect(find.byType(PopScope), findsNothing);
     });
 
     testWidgets('controller change triggers a rebuild with correct state',
@@ -1389,21 +1388,19 @@ void main() {
       expect(navigators.last.observers, equals(observers));
     });
 
-    testWidgets('SystemNavigator.pop respects when WillPopScope returns false',
+    testWidgets('SystemNavigator.pop respects PopScope(canPop: false)',
         (tester) async {
       const targetKey = Key('__target__');
-      var onWillPopCallCount = 0;
+      var onPopCallCount = 0;
       final flow = FlowBuilder<int>(
         state: 0,
         onGeneratePages: (state, pages) {
           return <Page<dynamic>>[
             MaterialPage<void>(
               child: Builder(
-                builder: (context) => WillPopScope(
-                  onWillPop: () async {
-                    onWillPopCallCount++;
-                    return false;
-                  },
+                builder: (context) => PopScope(
+                  canPop: false,
+                  onPopInvoked: (_) => onPopCallCount++,
                   child: TextButton(
                     key: targetKey,
                     onPressed: () {
@@ -1441,24 +1438,23 @@ void main() {
       await tester.tap(find.byKey(targetKey));
       await tester.pumpAndSettle();
 
-      expect(onWillPopCallCount, equals(1));
+      expect(onPopCallCount, equals(1));
       expect(find.byKey(targetKey), findsOneWidget);
     });
 
-    testWidgets('SystemNavigator.pop respects when WillPopScope returns true',
+    testWidgets('SystemNavigator.pop respects PopScope(canPop: true)',
         (tester) async {
       const targetKey = Key('__target__');
-      var onWillPopCallCount = 0;
+      var onPopCallCount = 0;
       final flow = FlowBuilder<int>(
         state: 0,
         onGeneratePages: (state, pages) {
           return <Page<dynamic>>[
             MaterialPage<void>(
               child: Builder(
-                builder: (context) => WillPopScope(
-                  onWillPop: () async {
-                    onWillPopCallCount++;
-                    return true;
+                builder: (context) => PopScope(
+                  onPopInvoked: (_) {
+                    onPopCallCount++;
                   },
                   child: TextButton(
                     key: targetKey,
@@ -1497,7 +1493,7 @@ void main() {
       await tester.tap(find.byKey(targetKey));
       await tester.pumpAndSettle();
 
-      expect(onWillPopCallCount, equals(1));
+      expect(onPopCallCount, equals(1));
       expect(find.byKey(targetKey), findsNothing);
     });
 
