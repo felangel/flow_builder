@@ -1,7 +1,8 @@
 # 0.1.0
 
 - **BREAKING**: replace deprecated `WillPopScope` with `PopScope`
-- refactor: update dart sdk constrant to `>=3.2.0`
+  - refactor: update dart sdk constrant to `>=3.2.0`
+  - refactor: update flutter constraint to `>=3.16.0`
 
 # 0.0.10
 
