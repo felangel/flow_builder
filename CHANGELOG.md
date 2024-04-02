@@ -3,6 +3,9 @@
 - **BREAKING**: replace deprecated `WillPopScope` with `PopScope`
   - refactor: update dart sdk constrant to `>=3.2.0`
   - refactor: update flutter constraint to `>=3.16.0`
+- refactor: update lint rules
+- chore: update copyright year
+- chore: update example (including native platforms)
 
 # 0.0.10
 
