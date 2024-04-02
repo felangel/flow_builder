@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/workflows/build/badge.svg?branch=master" alt="build"></a>
+<a href="https://github.com/felangel/flow_builder/actions"><img src="https://github.com/felangel/flow_builder/actions/workflows/main.yaml/badge.svg" alt="build"></a>
 <a href="https://github.com/felangel/flow_builder/actions"><img src="https://raw.githubusercontent.com/felangel/flow_builder/master/coverage_badge.svg" alt="coverage"></a>
 <a href="https://pub.dev/packages/flow_builder"><img src="https://img.shields.io/pub/v/flow_builder.svg" alt="pub package"></a>
 </p>
