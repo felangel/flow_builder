@@ -1,3 +1,4 @@
+/// A Flutter package which simplifies flows with a flexible, declarative API.
 library flow_builder;
 
 import 'dart:collection';
@@ -42,13 +43,13 @@ typedef FlowCallback<T> = T Function(T state);
 class FlowBuilder<T> extends StatefulWidget {
   /// {@macro flow_builder}
   const FlowBuilder({
-    super.key,
     required this.onGeneratePages,
     this.state,
     this.onComplete,
     this.controller,
     this.observers = const <NavigatorObserver>[],
     this.clipBehavior = Clip.hardEdge,
+    super.key,
   })  : assert(
           state != null || controller != null,
           'requires either state or controller',
@@ -204,9 +205,9 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
 
 class _InheritedFlowController<T> extends InheritedWidget {
   const _InheritedFlowController({
-    super.key,
     required this.controller,
     required super.child,
+    super.key,
   });
 
   final FlowController<T> controller;

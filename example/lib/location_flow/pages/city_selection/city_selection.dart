@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CitySelection extends StatelessWidget {
-  const CitySelection({super.key, required this.state});
+  const CitySelection({required this.state, super.key});
 
   static MaterialPage<void> page({required String state}) {
     return MaterialPage<void>(child: CitySelection(state: state));

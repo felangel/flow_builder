@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class Dropdown extends StatelessWidget {
   const Dropdown({
-    super.key,
     required this.items,
     required this.onChanged,
     this.value,
     this.hint,
+    super.key,
   });
 
   final Widget? hint;
