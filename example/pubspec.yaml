@@ -10,8 +10,7 @@ environment:
 dependencies:
   bloc: ^8.0.0
   equatable: ^2.0.0
-  flow_builder:
-    path: ../
+  flow_builder: ^0.1.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.0.0

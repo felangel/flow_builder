@@ -1,0 +1,3 @@
+dependency_overrides:
+  flow_builder:
+    path: ../
