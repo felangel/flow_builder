@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StateSelection extends StatelessWidget {
-  const StateSelection({super.key, required this.country});
+  const StateSelection({required this.country, super.key});
 
   static MaterialPage<void> page({required String country}) {
     return MaterialPage<void>(child: StateSelection(country: country));
