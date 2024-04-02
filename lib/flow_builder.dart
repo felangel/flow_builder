@@ -178,7 +178,6 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       controller: _controller,
       child: _ConditionalPopScope(
         condition: _canPop,
-        onPopInvoked: (bool _) => _navigator?.maybePop(),
         child: Navigator(
           key: _navigatorKey,
           pages: _pages,
@@ -330,23 +329,15 @@ class FakeFlowController<T> extends FlowController<T> {
 class _ConditionalPopScope extends StatelessWidget {
   const _ConditionalPopScope({
     required this.condition,
-    required this.onPopInvoked,
     required this.child,
   });
 
   final bool condition;
   final Widget child;
-  final PopInvokedCallback onPopInvoked;
 
   @override
   Widget build(BuildContext context) {
-    return condition
-        ? PopScope(
-            canPop: false,
-            onPopInvoked: onPopInvoked,
-            child: child,
-          )
-        : child;
+    return condition ? PopScope(canPop: false, child: child) : child;
   }
 }
 

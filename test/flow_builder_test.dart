@@ -1388,7 +1388,7 @@ void main() {
       expect(navigators.last.observers, equals(observers));
     });
 
-    testWidgets('SystemNavigator.pop respects when PopScope(canPop: false)',
+    testWidgets('SystemNavigator.pop respects PopScope(canPop: false)',
         (tester) async {
       const targetKey = Key('__target__');
       var onPopCallCount = 0;
@@ -1442,7 +1442,7 @@ void main() {
       expect(find.byKey(targetKey), findsOneWidget);
     });
 
-    testWidgets('SystemNavigator.pop respects when PopScope(canPop: true)',
+    testWidgets('SystemNavigator.pop respects PopScope(canPop: true)',
         (tester) async {
       const targetKey = Key('__target__');
       var onPopCallCount = 0;
