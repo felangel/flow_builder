@@ -4,7 +4,7 @@ repository: https://github.com/felangel/flow_builder
 homepage: https://github.com/felangel/flow_builder
 topics: [navigation, routing]
 
-version: 0.0.10
+version: 0.1.0
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
