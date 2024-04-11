@@ -1,3 +1,7 @@
+# 0.1.1
+
+- fix: SystemNavigator.pop respects PopScope(canPop: true)
+
 # 0.1.0
 
 - **BREAKING**: replace deprecated `WillPopScope` with `PopScope`
