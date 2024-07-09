@@ -3,6 +3,7 @@ description: Flutter Flows made easy! A Flutter package which simplifies flows w
 repository: https://github.com/felangel/flow_builder
 homepage: https://github.com/felangel/flow_builder
 topics: [navigation, routing]
+funding: [https://github.com/sponsors/felangel]
 
 version: 0.1.0
 
