@@ -184,7 +184,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
           pages: _pages,
           observers: widget.observers,
           clipBehavior: widget.clipBehavior,
-          onPopPage: (route, dynamic result) {
+          onDidRemovePage: (page) {
             if (_history.length > 1) {
               _history.removeLast();
               _didPop = true;
@@ -194,8 +194,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
               _pages.removeLast();
             }
             setState(() {});
-            route.onPopInvoked(true);
-            return route.didPop(result);
+            page.onPopInvoked(true, null);
           },
         ),
       ),
