@@ -381,12 +381,3 @@ abstract class _SystemNavigationObserver implements WidgetsBinding {
     }
   }
 }
-
-/// Visible for testing system navigation.
-abstract class TestSystemNavigationObserver {
-  /// Visible for testing system pop navigation.
-  @visibleForTesting
-  static Future<dynamic> handleSystemNavigation(MethodCall methodCall) {
-    return _SystemNavigationObserver._handleSystemNavigation(methodCall);
-  }
-}
