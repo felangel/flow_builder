@@ -1389,7 +1389,7 @@ void main() {
               child: Builder(
                 builder: (context) => PopScope(
                   canPop: false,
-                  onPopInvoked: (_) => onPopCallCount++,
+                  onPopInvokedWithResult: (_, __) => onPopCallCount++,
                   child: TextButton(
                     key: targetKey,
                     onPressed: () {
@@ -1440,9 +1440,7 @@ void main() {
             MaterialPage<void>(
               child: Builder(
                 builder: (context) => PopScope(
-                  onPopInvoked: (_) {
-                    onPopCallCount++;
-                  },
+                  onPopInvokedWithResult: (_, __) => onPopCallCount++,
                   child: TextButton(
                     key: targetKey,
                     onPressed: () {
