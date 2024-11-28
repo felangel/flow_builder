@@ -516,12 +516,10 @@ void main() {
       expect(numBuilds, 2);
       expect(find.byKey(buttonKey), findsNothing);
       expect(find.byKey(scaffoldKey), findsOneWidget);
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('pushRoute'),
-      );
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('popRoute'),
-      );
+
+      await tester.sendPlatformPush();
+      await tester.sendPlatformPop();
+
       await tester.pumpAndSettle();
 
       expect(numBuilds, 2);
@@ -571,9 +569,7 @@ void main() {
       expect(find.byKey(buttonKey), findsOneWidget);
       expect(find.byKey(scaffoldKey), findsNothing);
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('popRoute'),
-      );
+      await tester.sendPlatformPop();
       await tester.pumpAndSettle();
 
       expect(systemPopCallCount, equals(1));
@@ -634,9 +630,7 @@ void main() {
       expect(find.byKey(buttonKey), findsNothing);
       expect(find.byKey(scaffoldKey), findsOneWidget);
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('popRoute'),
-      );
+      await tester.sendPlatformPop();
       await tester.pumpAndSettle();
 
       expect(systemPopCallCount, equals(0));
@@ -699,9 +693,7 @@ void main() {
       expect(find.byKey(buttonKey), findsNothing);
       expect(find.byKey(scaffoldKey), findsOneWidget);
 
-      await TestSystemNavigationObserver.handleSystemNavigation(
-        const MethodCall('popRoute'),
-      );
+      await tester.sendPlatformPop();
       await tester.pumpAndSettle();
 
       expect(systemPopCallCount, equals(0));
@@ -922,12 +914,7 @@ void main() {
         );
         expect(numBuilds, 1);
 
-        await TestSystemNavigationObserver.handleSystemNavigation(
-          const MethodCall(
-            'pushRoute',
-            path,
-          ),
-        );
+        await tester.sendPlatformPush(path);
         await tester.pumpAndSettle();
         expect(observer.lastRoute, path);
         expect(observer.pushCount, 1);
@@ -959,9 +946,7 @@ void main() {
         );
         expect(numBuilds, 1);
 
-        await TestSystemNavigationObserver.handleSystemNavigation(
-          const MethodCall('pushRoute'),
-        );
+        await tester.sendPlatformPush();
         await tester.pumpAndSettle();
         expect(observer.lastRoute, isNull);
         expect(observer.pushCount, 0);
@@ -992,8 +977,12 @@ void main() {
         );
         expect(numBuilds, 1);
 
-        await TestSystemNavigationObserver.handleSystemNavigation(
-          const MethodCall('randomMethod'),
+        await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+          'flutter/navigation',
+          const JSONMethodCodec().encodeMethodCall(
+            const MethodCall('randomMethod'),
+          ),
+          (_) {},
         );
         await tester.pumpAndSettle();
         expect(observer.lastRoute, isNull);
@@ -1404,9 +1393,7 @@ void main() {
                   child: TextButton(
                     key: targetKey,
                     onPressed: () {
-                      TestSystemNavigationObserver.handleSystemNavigation(
-                        const MethodCall('popRoute'),
-                      );
+                      tester.sendPlatformPop();
                     },
                     child: const SizedBox(),
                   ),
@@ -1459,9 +1446,7 @@ void main() {
                   child: TextButton(
                     key: targetKey,
                     onPressed: () {
-                      TestSystemNavigationObserver.handleSystemNavigation(
-                        const MethodCall('popRoute'),
-                      );
+                      tester.sendPlatformPop();
                     },
                     child: const SizedBox(),
                   ),
@@ -1561,5 +1546,26 @@ class _TestPushWidgetsBindingObserver with WidgetsBindingObserver {
     lastRoute = route;
     pushCount++;
     return true;
+  }
+}
+
+extension WidgetTesterX on WidgetTester {
+  Future<void> sendPlatformPop() async {
+    final message = const JSONMethodCodec().encodeMethodCall(
+      const MethodCall('popRoute'),
+    );
+    await _sendSystemNavigationMessage(message);
+  }
+
+  Future<void> sendPlatformPush([String? route]) async {
+    final message = const JSONMethodCodec().encodeMethodCall(
+      MethodCall('pushRoute', route),
+    );
+    await _sendSystemNavigationMessage(message);
+  }
+
+  Future<void> _sendSystemNavigationMessage(ByteData message) async {
+    await binding.defaultBinaryMessenger
+        .handlePlatformMessage('flutter/navigation', message, (_) {});
   }
 }
